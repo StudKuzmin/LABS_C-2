@@ -1,0 +1,143 @@
+#include <iostream>
+#include <windows.h>
+
+
+using namespace std;
+
+
+struct datetime
+{
+	int day, month, year, seconds, minutes, hours;
+	int time;
+
+	void input1() // Ввод даты 1
+	{
+		cout << "Введите дату 1(дд.мм.гггг.): " << endl;
+		cin >> day >> month >> year;
+
+		cout << "Введите время(чч.мм.сс.): " << endl; cin >> time;
+		hours = time / 1e+4;
+		seconds = time % 100;
+		minutes = time % 10000; minutes /= 1e+2;
+	}
+
+	void input2() // Ввод даты 2
+	{
+		cout << "Введите дату 2(дд.мм.гггг.): " << endl;
+		cin >> day >> month >> year;
+
+		cout << "Введите время(чч.мм.сс.): " << endl; cin >> time;
+		hours = time / 1e+4;
+		seconds = time % 100;
+		minutes = time % 10000; minutes /= 1e+2;
+	}
+
+};
+
+
+
+
+
+void output1(datetime time1) // Вывод даты 1
+{
+	cout << "Полученная дата 1: " << time1.day << "." << time1.month << "." << time1.year << ", ";
+	cout << time1.hours << ":" << time1.minutes << ":" << time1.seconds << endl;
+}
+
+void output2(datetime time2) // Вывод даты 2
+{
+	cout << "Полученная дата 2: " << time2.day << "." << time2.month << "." << time2.year << ", ";
+	cout << time2.hours << ":" << time2.minutes << ":" << time2.seconds << endl;
+}
+
+
+
+
+
+void difference(datetime time1, datetime time2, int result[]) // дата 2 - дата 1
+{
+	result[0] = time2.day - time1.day;
+	result[1] = time2.month - time1.month;
+	result[2] = time2.year - time1.year;
+}
+
+void aga()	// Присваивание дням значений
+{
+	int arr[13]{}; int a = 31; int b = 30;
+
+	for (int i = 1; i <= 12; i++)
+	{
+		if (i == 2) continue;
+
+		if (i % 2 != 0 && i < 8) arr[i] = a;		// Если месяц нечётный и меньше 8
+		else if (i % 2 == 0 && i < 8) arr[i] = b;	// Если месяц чётный и меньше 8
+
+		if (i % 2 == 0 && i >= 8) arr[i] = a;		// Если месяц чётный и больше 7
+		else if (i % 2 != 0 && i >= 8) arr[i] = b;	// Если месяц нечётный и больше 7
+	}
+
+	
+
+	for (int i = 1; i < 13; i++)
+	{
+		cout << i << ">\t" << arr[i] << endl;
+	}
+
+}
+
+
+bool checkQuantityDMY(datetime time) // Проверка на правильность введённой даты
+{
+	int arr[12]{};
+
+	if (time.month > 12 || time.month < 1)	// Месяц
+	{
+		printf("Введённый месяц не существует!\n");
+		
+		return false;
+	}
+
+	
+
+}
+
+
+
+
+
+int main()
+{
+	setlocale(LC_ALL, "ru");
+	HANDLE error = GetStdHandle(STD_OUTPUT_HANDLE);
+
+	aga();
+
+	datetime time1;
+	datetime time2;
+
+	L1:
+	time1.input1();	// Ввод даты 1
+	if (checkQuantityDMY(time1) == false) goto L1;
+	cout << endl;
+	L2:
+	time2.input2();	// Ввод даты 2
+	if (checkQuantityDMY(time2) == false) goto L2;
+
+	cout << endl << "#######################################" << endl << endl;
+
+	output1(time1);	// Вывод даты 1
+	output2(time2);	// Вывод даты 2
+
+	cout << endl << "#######################################" << endl << endl;
+
+
+	
+	const int SIZE = 6;
+	int result[SIZE]{};
+	difference(time1, time2, result);
+	cout << "Результат: " << endl;
+	cout << result[0] << "." << result[1] << "." << result[2] << endl;
+	
+
+	return 0;
+}
