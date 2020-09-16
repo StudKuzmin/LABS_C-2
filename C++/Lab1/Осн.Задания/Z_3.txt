@@ -1,0 +1,233 @@
+#include <iostream>
+#include <windows.h>
+
+#define White SetConsoleTextAttribute(error, FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN);
+#define Red SetConsoleTextAttribute(error, FOREGROUND_RED);
+
+using namespace std;
+
+
+struct datetime
+{
+	int day, month, year, seconds, minutes, hours;
+
+	void InputDate1() // МЕТОД Ввод даты
+	{
+		printf("Введите дату 1(дд.мм.гггг.):\n");
+		printf("*День:\t"); cin >> day;
+		printf("*Месяц:\t"); cin >> month;
+		printf("*Год:\t"); cin >> year;
+
+		printf("Введите время(чч.мм.сс.):\n");
+		printf("*часы:\t\t"); cin >> hours;
+		printf("*минуты:\t"); cin >> minutes;
+		printf("*секунды:\t"); cin >> seconds;
+	}
+
+	void OutputDate() // МЕТОД Вывод даты
+	{
+		cout << "Полученная дата:\t\t " << day << "." << month << "." << year << ", ";
+		cout << hours << ":" << minutes << ":" << seconds << endl;
+	}
+	void Output_NextDate() // МЕТОД Вывод даты
+	{
+		cout << "Полученная следующая дата:\t " << day << "." << month << "." << year << ", ";
+		cout << hours << ":" << minutes << ":" << seconds << endl;
+	}
+	void Output_PreviousDate() // МЕТОД Вывод даты
+	{
+		cout << "Полученная предыдущая дата:\t " << day << "." << month << "." << year << ", ";
+		cout << hours << ":" << minutes << ":" << seconds << endl;
+	}
+
+	void NextDate()		// МЕТОД Получить следуюущую дату
+	{
+		int arr[12] = { 31, 0, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+
+		for (int i = 0; i < 12; i++)
+		{
+			if (month != 2 && month == i + 1 && day == arr[i])	// Если день последний в месяце
+			{
+				day = 1;
+				month = month + 1;
+				break;
+			}
+			else if (month != 2 && month == 12 && day == arr[i])	// Если день последний в 12 месяце
+			{
+				day = 1;
+				month = 1;
+				++year;
+				break;
+			}
+			else if (month != 2 && month == i + 1 && day != arr[i])	// Если день не последний
+			{
+				++day;
+				break;
+			}
+
+			if (month == 2 && day == 29 && (year % 4 == 0 && year % 100 != 0 || year % 400 == 0))	// Если год високосный и день последний в месяце
+			{
+				day = 1;
+				month = month + 1;
+				break;
+			}
+			else if (month == 2 && (year % 4 == 0 && year % 100 != 0 || year % 400 == 0))	// Если год високосный и день не последний в месяце
+			{
+				++day;
+				break;
+			}
+			
+			if (month == 2 && day == 28 && year % 4 != 0)	// Если год не високосный и день последний в месяце
+			{
+				day = 1;
+				month = month + 1;
+				break;
+			}
+			else if (month == 2 && year % 4 != 0)	// Если год не високосный и день не последний в месяце
+			{
+				++day;
+				break;
+			}
+
+		}
+
+	}
+
+	void PreviousDate()	// МЕТОД Получить предыдущую дату
+	{
+		int arr[12] = { 31, 0, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+
+		for (int i = 0; i < 12; i++)
+		{
+			
+			if (month == 1 && day == 2)	// Если 1й день в 1м месяце
+			{
+				day = arr[i+11];
+				month = 12;
+				--year;
+				break;
+			}
+			else if (month == 1 && day == 1)	// Если последний день в 12 месяце
+			{
+				day = arr[i+11] - 1;
+				month = 12;
+				--year;
+				break;
+			}
+			else if (month == i + 1 && day == 2)	// Если 1й день в месяце
+			{
+				day = arr[i-1];
+				month = month - 1;
+				break;
+			}
+			else if (month == i + 1 && day != 2)	// Если день не 1й
+			{
+				day = day - 2;
+				break;
+			}
+
+			if (month == 3 && day == 2 && (year % 4 == 0 && year % 100 != 0 || year % 400 == 0))	// Если 1й день и год високосный
+			{
+				day = 29;
+				month = month - 1;
+				break;
+			}
+			else if (month == 3 && day == 2 && year % 4 != 0)	// Если 1й день и год не високосный
+			{
+				day = 28;
+				month = month - 1;
+				break;
+			}
+
+		}
+	}
+
+};
+
+
+bool checkQuantityDMY(datetime time) // Проверка на правильность введённой даты
+{
+	int arr[12] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+
+	if (time.month > 12 || time.month < 1)	// Месяц
+	{
+		printf("Введённый месяц не существует!\n");
+
+		return false;
+	}
+
+	for (int i = 1; i <= 12; i++)	// День
+	{
+		if (time.day < 0)
+		{
+			printf("Такого дня не существует!\n");
+
+			return false;
+		}
+
+		
+		if (time.month != 2 && time.month == i + 1 && time.day > arr[i])
+		{
+			printf("Такого дня не существует!\n");
+
+			return false;
+		}
+
+		if (time.month == 2 && time.day > 29 && (time.year % 4 == 0 && time.year % 100 != 0 || time.year % 400 == 0))	// Если год високосный
+		{
+			printf("Такого дня не существует\n");
+
+			return false;
+		}
+		else if (time.month == 2 && time.day > 28 && time.year % 4 != 0)	// Если год не високосный
+		{
+			printf("Такого дня не существует!\n");
+
+			return false;
+		}
+
+	}
+
+	return true;
+}
+
+
+
+
+
+int main()
+{
+	setlocale(LC_ALL, "ru");
+	HANDLE error = GetStdHandle(STD_OUTPUT_HANDLE);
+
+
+	datetime time1;
+
+	L1:
+	time1.InputDate1();	// Ввод даты
+	Red
+	if (checkQuantityDMY(time1) == false)
+	{
+		Sleep(1000);
+		system("CLS");
+		White
+		goto L1;
+	}
+	White
+	Sleep(500);
+	system("CLS");
+	
+	cout << "#######################################" << endl << endl;
+
+	time1.OutputDate();	// Вывод даты
+	time1.NextDate();
+	time1.Output_NextDate();	// Вывод даты
+	time1.PreviousDate();
+	time1.Output_PreviousDate();	// Вывод даты
+	
+	
+
+	cout << endl << "#######################################" << endl << endl;
+
+	return 0;
+}
