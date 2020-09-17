@@ -76,7 +76,7 @@ struct datetime
 				++day;
 				break;
 			}
-			
+
 			if (month == 2 && day == 28 && year % 4 != 0)	// Если год не високосный и день последний в месяце
 			{
 				day = 1;
@@ -99,24 +99,30 @@ struct datetime
 
 		for (int i = 0; i < 12; i++)
 		{
-			
+
 			if (month == 1 && day == 2)	// Если 1й день в 1м месяце
 			{
-				day = arr[i+11];
+				day = arr[i + 11];
 				month = 12;
 				--year;
 				break;
 			}
+			else if (month == i + 1 && day == 1)	// Если последний день в 12 месяце
+			{
+				day = arr[i - 1] - 1;
+				month = month - 1;
+				break;
+			}
 			else if (month == 1 && day == 1)	// Если последний день в 12 месяце
 			{
-				day = arr[i+11] - 1;
+				day = arr[i + 11] - 1;
 				month = 12;
 				--year;
 				break;
 			}
 			else if (month == i + 1 && day == 2)	// Если 1й день в месяце
 			{
-				day = arr[i-1];
+				day = arr[i - 1];
 				month = month - 1;
 				break;
 			}
@@ -165,7 +171,7 @@ bool checkQuantityDMY(datetime time) // Проверка на правильно
 			return false;
 		}
 
-		
+
 		if (time.month != 2 && time.month == i + 1 && time.day > arr[i])
 		{
 			printf("Такого дня не существует!\n");
@@ -203,20 +209,20 @@ int main()
 
 	datetime time1;
 
-	L1:
+L1:
 	time1.InputDate1();	// Ввод даты
 	Red
-	if (checkQuantityDMY(time1) == false)
-	{
-		Sleep(1000);
-		system("CLS");
-		White
-		goto L1;
-	}
+		if (checkQuantityDMY(time1) == false)
+		{
+			Sleep(1000);
+			system("CLS");
+			White
+				goto L1;
+		}
 	White
-	Sleep(500);
+		Sleep(500);
 	system("CLS");
-	
+
 	cout << "#######################################" << endl << endl;
 
 	time1.OutputDate();	// Вывод даты
@@ -224,8 +230,8 @@ int main()
 	time1.Output_NextDate();	// Вывод даты
 	time1.PreviousDate();
 	time1.Output_PreviousDate();	// Вывод даты
-	
-	
+
+
 
 	cout << endl << "#######################################" << endl << endl;
 
