@@ -1,43 +1,31 @@
 #include <iostream>
 #include <windows.h>
+#include <fstream>
 
 #define White SetConsoleTextAttribute(error, FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN);
 #define Red SetConsoleTextAttribute(error, FOREGROUND_RED);
 
 using namespace std;
-
+int n = 10;
 
 struct datetime
 {
-	int day, month, year, seconds, minutes, hours;
+	int number;
+	int day;
+	int month;
+	int year;
 
-	void InputDate1() // МЕТОД Ввод даты
+	void OutputDate() // МЕТОД Вывод текущей даты
 	{
-		printf("Введите дату 1(дд.мм.гггг.):\n");
-		printf("*День:\t"); cin >> day;
-		printf("*Месяц:\t"); cin >> month;
-		printf("*Год:\t"); cin >> year;
-
-		printf("Введите время(чч.мм.сс.):\n");
-		printf("*часы:\t\t"); cin >> hours;
-		printf("*минуты:\t"); cin >> minutes;
-		printf("*секунды:\t"); cin >> seconds;
+		cout << "Полученная дата " << number << ":\t\t " << day << "." << month << "." << year;
 	}
-
-	void OutputDate() // МЕТОД Вывод даты
+	void Output_NextDate() // МЕТОД Вывод следующей даты
 	{
-		cout << "Полученная дата:\t\t " << day << "." << month << "." << year << ", ";
-		cout << hours << ":" << minutes << ":" << seconds << endl;
+		cout << "\tСледующая дата:\t " << day << "." << month << "." << year;
 	}
-	void Output_NextDate() // МЕТОД Вывод даты
+	void Output_PreviousDate() // МЕТОД Вывод предыдущей даты
 	{
-		cout << "Полученная следующая дата:\t " << day << "." << month << "." << year << ", ";
-		cout << hours << ":" << minutes << ":" << seconds << endl;
-	}
-	void Output_PreviousDate() // МЕТОД Вывод даты
-	{
-		cout << "Полученная предыдущая дата:\t " << day << "." << month << "." << year << ", ";
-		cout << hours << ":" << minutes << ":" << seconds << endl;
+		cout << "\tПредыдущая дата:\t " << day << "." << month << "." << year << endl;
 	}
 
 	void NextDate()		// МЕТОД Получить следуюущую дату
@@ -160,93 +148,106 @@ struct datetime
 
 		}
 	}
-
 };
 
-
-bool checkQuantityDMY(datetime time) // Проверка на правильность введённой даты
+int nmbr_of_smbls()	//	Функция подсчёта символов в файле
 {
-	int arr[12] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-
-	if (time.month > 12 || time.month < 1)	// Месяц
+	ifstream info("C:\\Users\\ahgin\\Desktop\\Lab1\\file.txt");
+	if (!info)
 	{
-		printf("Введённый месяц не существует!\n");
-
-		return false;
+		cout << "Ошибка открытия файла" << endl;
 	}
 
-	for (int i = 1; i <= 12; i++)	// День
+	char symbol; int count = 0;
+	while (info.get(symbol))
 	{
-		if (time.day < 0)
-		{
-			printf("Такого дня не существует!\n");
-
-			return false;
-		}
-
-
-		if (time.month != 2 && time.month == i + 1 && time.day > arr[i])
-		{
-			printf("Такого дня не существует!\n");
-
-			return false;
-		}
-
-		if (time.month == 2 && time.day > 29 && (time.year % 4 == 0 && time.year % 100 != 0 || time.year % 400 == 0))	// Если год високосный
-		{
-			printf("Такого дня не существует\n");
-
-			return false;
-		}
-		else if (time.month == 2 && time.day > 28 && time.year % 4 != 0)	// Если год не високосный
-		{
-			printf("Такого дня не существует!\n");
-
-			return false;
-		}
-
+		count++;
 	}
 
-	return true;
+	return count;
 }
 
+int nmbr_of_date()	// Функция подсчёта дат в файле
+{
+	ifstream info;
+	if (!info)
+	{
+		cout << "Ошибка открытия файла" << endl;
+	}
+
+	int sz = nmbr_of_smbls(); int i = 0; int count = 1;
+	char* str = new char[sz];
+
+	info.open("C:\\Users\\ahgin\\Desktop\\Lab1\\file.txt");
+	while (info.get(str[i]))	// Посимвольное считывание
+	{
+		if (str[i] == '\n') count++;	// Количество дат
+		i++;
+	}
+	info.close();
+
+	return count;
+}
+
+int check()	// Проверка на количество дат
+{
+	int count = nmbr_of_date();
+	if (count < n)
+	{
+		cout << "Ошибка! Количество дат в файле меньше заданного количества объектов." << endl;
+		cout << "Идёт замена заданного количества объектов на максимальное количество дат в файле.." << endl;
+		n = count;
+	}
+
+	return n;
+}
+
+void funk(datetime* arr)	// Запись из файла в объекты
+{
+	ifstream info;
+	if (!info)
+	{
+		cout << "Ошибка открытия файла" << endl;
+	}
+
+	int sz = check();
+	info.open("c:\\users\\ahgin\\desktop\\lab1\\file.txt");
+	for (int i = 0; i < sz; i++)	// считываем номера
+	{
+		info >> arr[i].number; info >> arr[i].day; info >> arr[i].month; info >> arr[i].year;
+		cout << arr[i].number << "\t" << arr[i].day << "\t" << arr[i].month << "\t" << arr[i].year << endl;
+	}
+	info.close();
+}
 
 
 
 
 int main()
 {
+
 	setlocale(LC_ALL, "ru");
 	HANDLE error = GetStdHandle(STD_OUTPUT_HANDLE);
 
+	ifstream info("C:\\Users\\ahgin\\Desktop\\Lab1\\file.txt");
+	if (!info)
+	{
+		cout << "Ошибка открытия файла" << endl;
+	}
 
-	datetime time1;
+	datetime* arr = new datetime[n];
 
-L1:
-	time1.InputDate1();	// Ввод даты
-	Red
-		if (checkQuantityDMY(time1) == false)
-		{
-			Sleep(1000);
-			system("CLS");
-			White
-				goto L1;
-		}
-	White
-		Sleep(500);
-	system("CLS");
+	funk(arr);
 
-	cout << "#######################################" << endl << endl;
-
-	time1.OutputDate();	// Вывод даты
-	time1.NextDate();
-	time1.Output_NextDate();	// Вывод даты
-	time1.PreviousDate();
-	time1.Output_PreviousDate();	// Вывод даты
-
-
-
-	cout << endl << "#######################################" << endl << endl;
+	int sz = check();
+	for (int i = 0; i < sz; i++)
+	{
+		arr[i].OutputDate();
+		arr[i].NextDate();
+		arr[i].Output_NextDate();
+		arr[i].PreviousDate();
+		arr[i].Output_PreviousDate();
+	}
 
 	return 0;
 }
