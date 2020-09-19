@@ -109,7 +109,7 @@ struct datetime
 			}
 			else if (month == 1 && day == 1)	// Если последний день в 12 месяце
 			{
-				day = arrd[i + 11];
+				day = arrd[i + 11] - 1;
 				month = 12;
 				--year;
 				break;
@@ -134,11 +134,11 @@ struct datetime
 
 			if (month == 3 && day == 1 && (year % 4 == 0 && year % 100 != 0 || year % 400 == 0))	// Если 1й день и год високосный
 			{
-				day = 29;
+				day = 29 - 1;
 				month = month - 1;
 				break;
 			}
-			else if (month == 3 && day == 2 && (year % 4 == 0 && year % 100 != 0 || year % 400 == 0))	// Если 1й день и год високосный
+			else if (month == 3 && day == 2 && (year % 4 == 0 && year % 100 != 0 || year % 400 == 0))	// Если 2й день и год високосный
 			{
 				day = 29;
 				month = month - 1;
@@ -147,11 +147,11 @@ struct datetime
 
 			if (month == 3 && day == 1 && year % 4 != 0)	// Если 1й день и год не високосный
 			{
-				day = 28;
+				day = 28 - 1;
 				month = month - 1;
 				break;
 			}
-			if (month == 3 && day == 2 && year % 4 != 0)	// Если 1й день и год не високосный
+			else if (month == 3 && day == 2 && year % 4 != 0)	// Если 2й день и год не високосный
 			{
 				day = 28;
 				month = month - 1;
