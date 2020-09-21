@@ -1,0 +1,218 @@
+#include <iostream>
+#include <ctime>
+#include <windows.h>
+#define White SetConsoleTextAttribute(error, FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN);
+#define Red SetConsoleTextAttribute(error, FOREGROUND_RED);
+
+using namespace std;
+
+
+struct datetime
+{
+	int day, month, year;
+	int second, minute, hour;
+
+	void InputDate1() // МЕТОД ввод даты 1
+	{
+		cout << "Введите дату 1(дд.мм.гггг.): " << endl;
+		cout << "День*\t"; cin >> day;
+		cout << "Месяц*\t"; cin >> month;
+		cout << "Год*\t"; cin >> year;
+
+	/*	cout << endl << "Введите время(чч.мм.сс.): " << endl;
+		cout << "Секунда*\t"; cin >> second;
+		cout << "Минута*\t\t"; cin >> minute;
+		cout << "Час*\t\t"; cin >> hour;*/
+
+	}
+
+	void InputDate2() // МЕТОД ввод даты 2
+	{
+		cout << "Введите дату 2(дд.мм.гггг.): " << endl;
+		cout << "День*\t"; cin >> day;
+		cout << "Месяц*\t"; cin >> month;
+		cout << "Год*\t"; cin >> year;
+
+		/*cout << endl << "Введите время(чч.мм.сс.): " << endl;
+		cout << "Секунда*\t"; cin >> second;
+		cout << "Минута*\t\t"; cin >> minute;
+		cout << "Час*\t\t"; cin >> hour;*/
+
+	}
+
+	void OutputDate1() // МЕТОД Вывод даты
+	{
+		cout << "Полученная дата 1:\t\t " << day << "." << month << "." << year << ", ";
+		cout << hour << ":" << minute << ":" << second << endl;
+	}
+	void OutputDate2() // МЕТОД Вывод даты
+	{
+		cout << "Полученная дата 2:\t\t " << day << "." << month << "." << year << ", ";
+		cout << hour << ":" << minute << ":" << second << endl;
+	}
+};
+
+struct timedelta
+{
+	int day, month, year;
+	int second, minute, hour;
+
+	void OutputDate() // МЕТОД Вывод даты
+	{
+		cout << "Полученная дата:\t\t " << day << "." << month << "." << year << ", ";
+		cout << hour << ":" << minute << ":" << second << endl;
+	}
+};
+
+bool checkQuantityDMY(datetime time) // Проверка на правильность введённой даты
+{
+	int arr[12] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+
+	if (time.month > 12 || time.month < 1)	// Месяц
+	{
+		printf("Введённый месяц не существует!\n");
+
+		return false;
+	}
+
+	for (int i = 0; i < 12; i++)	// День
+	{
+		if (time.day < 0)
+		{
+			printf("Такого дня не существует!\n");
+
+			return false;
+		}
+
+		if (time.month != 2 && time.month == i + 1 && time.day > arr[i])
+		{
+			printf("Такого дня не существует!\n");
+
+			return false;
+		}
+
+		if (time.month == 2 && time.day > 29 && (time.year % 4 == 0 && time.year % 100 != 0 || time.year % 400 == 0))	// Если год високосный
+		{
+			printf("Такого дня не существует\n");
+
+			return false;
+		}
+		else if (time.month == 2 && time.day > 28 && time.year % 4 != 0)	// Если год не високосный
+		{
+			printf("Такого дня не существует!\n");
+
+			return false;
+		}
+
+	}
+
+	return true;
+}
+
+void fu(datetime time1, datetime time2, timedelta delta)	// Промежуток времени time1 - time2
+{
+	int arr[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };	// Не високосный
+	int arrV[12] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };	// Високосный
+	int res = 0;
+
+	if (time1.month < time2.month) delta.month = time2.month - time1.month;
+	else if (time1.month > time2.month) delta.month = time1.month - time2.month;
+	else delta.month = 0;
+	
+	for (int i = 0; i < 12; i++)	// Считаем дни
+	{
+		
+		if (time1.day < time2.day) delta.day = time2.day - time1.day;
+		else if (time1.day > time2.day) delta.day = time1.day - time2.day;
+		else delta.day = 0;
+	}
+
+	int t1m = time1.month; int t2m = time2.month;
+	if (time1.month < time2.month)
+	{
+		if (time1.year % 4 == 0 && time1.year % 100 != 0 || time1.year % 400 == 0)	// Високосный
+		{
+			for (t1m; t1m < time2.month; t1m++)
+			{
+				res = res + arrV[t1m - 1];	//	Складываем все месяцы с диапазоне от time2.month до time1.month
+			}
+		}
+		else if ( time1.year % 4 != 0)	// Не високосный
+		{
+			for (t1m; t1m < time2.month; t1m++)
+			{
+				res = res + arr[t1m - 1];	//	Складываем все месяцы с диапазоне от time2.month до time1.month
+			}
+		}
+
+	}
+
+	else if (time1.month > time2.month)
+	{
+		if (time1.year % 4 == 0 && time1.year % 100 != 0 || time1.year % 400 == 0)	// Високосный
+		{
+			for (t1m; t1m < time2.month; t1m++)
+			{
+				res = res + arrV[t1m - 1];	//	Складываем все месяцы с диапазоне от time1.month до time2.month
+			}
+		}
+		else if (time1.year % 4 != 0)	// Не високосный
+		{
+			for (t1m; t1m < time2.month; t1m++)
+			{
+				res = res + arr[t1m - 1];	//	Складываем все месяцы с диапазоне от time1.month до time2.month
+			}
+		}
+	}
+
+	res = res + delta.day;
+	cout << endl << "Промежуток времени:\t\t " << res << " Дн. " << endl;
+}
+
+int main()
+{
+	setlocale(LC_ALL, "ru");
+	HANDLE error = GetStdHandle(STD_OUTPUT_HANDLE);
+
+	datetime time1;
+	datetime time2;
+
+	timedelta delta;
+
+L1:
+	time1.InputDate1();	// Ввод даты 1
+	Red
+		if (checkQuantityDMY(time1) == false)
+		{
+			Sleep(1000);
+			system("CLS");
+			White
+				goto L1;
+		}
+	White
+		Sleep(500);
+	system("CLS");
+L2:
+	time2.InputDate2();	// Ввод даты 1
+	Red
+		if (checkQuantityDMY(time2) == false)
+		{
+			Sleep(1000);
+			system("CLS");
+			White
+				goto L2;
+		}
+	White
+		Sleep(500);
+	system("CLS");
+	
+	time1.OutputDate1();				// Вывод даты 1
+	time2.OutputDate2();				// Вывод даты 2
+
+	cout << endl << "################################" << endl;
+
+	delta.day = 0; delta.month = 0; delta.year = 0;
+	fu(time1, time2, delta);
+
+	return 0;
+}
