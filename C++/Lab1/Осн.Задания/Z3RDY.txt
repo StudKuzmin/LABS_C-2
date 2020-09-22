@@ -1,0 +1,258 @@
+#include <iostream>
+#include <windows.h>
+#include <fstream>
+
+#define White SetConsoleTextAttribute(error, FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN);
+#define Red SetConsoleTextAttribute(error, FOREGROUND_RED);
+
+using namespace std;
+int n = 15;
+
+struct datetime
+{
+	int number;
+	int day;
+	int month;
+	int year;
+
+	void OutputDate() // МЕТОД Вывод текущей даты
+	{
+		cout << "Полученная дата " << number << ":\t\t " << day << "." << month << "." << year;
+	}
+	void Output_NextDate() // МЕТОД Вывод следующей даты
+	{
+		cout << "\tСледующая дата:\t " << day << "." << month << "." << year;
+	}
+	void Output_PreviousDate() // МЕТОД Вывод предыдущей даты
+	{
+		cout << "\tПредыдущая дата:\t " << day << "." << month << "." << year << endl;
+	}
+
+	void NextDate()		// МЕТОД Получить следуюущую дату
+	{
+		int arra[12] = { 31, 0, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+
+		for (int i = 0; i < 12; i++)
+		{
+			if (month != 2 && month == i + 1 && day == arra[i])	// Если день последний в месяце
+			{
+				day = 1;
+				month = month + 1;
+				break;
+			}
+			else if (month != 2 && month == 12 && day == arra[i])	// Если день последний в 12 месяце
+			{
+				day = 1;
+				month = 1;
+				++year;
+				break;
+			}
+			else if (month != 2 && month == i + 1 && day != arra[i])	// Если день не последний
+			{
+				++day;
+				break;
+			}
+
+			if (month == 2 && day == 29 && (year % 4 == 0 && year % 100 != 0 || year % 400 == 0))	// Если год високосный и день последний в месяце
+			{
+				day = 1;
+				month = month + 1;
+				break;
+			}
+			else if (month == 2 && (year % 4 == 0 && year % 100 != 0 || year % 400 == 0))	// Если год високосный и день не последний в месяце
+			{
+				++day;
+				break;
+			}
+
+			if (month == 2 && day == 28 && year % 4 != 0)	// Если год не високосный и день последний в месяце
+			{
+				day = 1;
+				month = month + 1;
+				break;
+			}
+			else if (month == 2 && year % 4 != 0)	// Если год не високосный и день не последний в месяце
+			{
+				++day;
+				break;
+			}
+
+		}
+
+	}
+
+	void PreviousDate()	// МЕТОД Получить предыдущую дату
+	{
+		int arrd[12] = { 31, 0, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+
+		for (int i = 0; i < 12; i++)
+		{
+
+			if (month == 1 && day == 2)	// Если 1й день в 1м месяце
+			{
+				day = arrd[i + 11];
+				month = 12;
+				--year;
+				break;
+			}
+			else if (month == 1 && day == 1)	// Если последний день в 12 месяце
+			{
+				day = arrd[i + 11] - 1;
+				month = 12;
+				--year;
+				break;
+			}
+			else if (month == i + 1 && day == 1)	// Если последний день в 12 месяце
+			{
+				day = arrd[i - 1] - 1;
+				month = month - 1;
+				break;
+			}
+			else if (month == i + 1 && day == 2)	// Если 1й день в месяце
+			{
+				day = arrd[i - 1];
+				month = month - 1;
+				break;
+			}
+			else if (month == i + 1 && day != 2)	// Если день не 1й
+			{
+				day = day - 2;
+				break;
+			}
+
+			if (month == 3 && day == 1 && (year % 4 == 0 && year % 100 != 0 || year % 400 == 0))	// Если 1й день и год високосный
+			{
+				day = 29 - 1;
+				month = month - 1;
+				break;
+			}
+			else if (month == 3 && day == 2 && (year % 4 == 0 && year % 100 != 0 || year % 400 == 0))	// Если 2й день и год високосный
+			{
+				day = 29;
+				month = month - 1;
+				break;
+			}
+
+			if (month == 3 && day == 1 && year % 4 != 0)	// Если 1й день и год не високосный
+			{
+				day = 28 - 1;
+				month = month - 1;
+				break;
+			}
+			else if (month == 3 && day == 2 && year % 4 != 0)	// Если 2й день и год не високосный
+			{
+				day = 28;
+				month = month - 1;
+				break;
+			}
+
+		}
+	}
+};
+
+int nmbr_of_smbls()	//	Функция подсчёта символов в файле
+{
+	ifstream info("C:\\Users\\ahgin\\Desktop\\Lab1\\file.txt");
+	if (!info)
+	{
+		cout << "Ошибка открытия файла" << endl;
+	}
+
+	char symbol; int count = 0;
+	while (info.get(symbol))
+	{
+		count++;
+	}
+
+	return count;
+}
+
+int nmbr_of_date()	// Функция подсчёта дат в файле
+{
+	ifstream info;
+	if (!info)
+	{
+		cout << "Ошибка открытия файла" << endl;
+	}
+
+	int sz = nmbr_of_smbls(); int i = 0; int count = 0;
+	char* str = new char[sz];
+
+	info.open("C:\\Users\\ahgin\\Desktop\\Lab1\\file.txt");
+	while (info.get(str[i]))	// Посимвольное считывание
+	{
+		if (str[i] == '\n') ++count;	// Количество дат
+		i++;
+	}
+	info.close();
+
+	delete[] str;
+	return count;
+}
+
+int check()	// Проверка на количество дат
+{
+	int count = nmbr_of_date();
+	HANDLE error = GetStdHandle(STD_OUTPUT_HANDLE);
+
+	Red
+	if (count < n)
+	{
+		cout << "Ошибка! Количество дат в файле меньше заданного количества объектов." << endl;
+		cout << "Идёт замена заданного количества объектов на максимальное количество дат в файле.." << endl;
+		n = count;
+	}
+	White
+
+	return n;
+}
+
+void funk(datetime* arr)	// Запись из файла в объекты
+{
+	ifstream info;
+	if (!info)
+	{
+		cout << "Ошибка открытия файла" << endl;
+	}
+
+	int sz = check();
+	info.open("c:\\users\\ahgin\\desktop\\lab1\\file.txt");
+	for (int i = 0; i < sz; i++)	// считываем номера
+	{
+		info >> arr[i].number; info >> arr[i].day; info >> arr[i].month; info >> arr[i].year;
+		cout << arr[i].number << "\t" << arr[i].day << "\t" << arr[i].month << "\t" << arr[i].year << endl;
+	}
+	info.close();
+}
+
+
+
+
+int main()
+{
+
+	setlocale(LC_ALL, "ru");
+
+	ifstream info("C:\\Users\\ahgin\\Desktop\\Lab1\\file.txt");
+	if (!info)
+	{
+		cout << "Ошибка открытия файла" << endl;
+	}
+
+	datetime* arr = new datetime[n];
+
+	funk(arr);
+
+	int sz = check();
+	for (int i = 0; i < sz; i++)
+	{
+		arr[i].OutputDate();
+		arr[i].NextDate();
+		arr[i].Output_NextDate();
+		arr[i].PreviousDate();
+		arr[i].Output_PreviousDate();
+	}
+
+	delete[] arr;
+	return 0;
+}
