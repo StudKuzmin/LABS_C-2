@@ -1,0 +1,153 @@
+#include <iostream>
+
+using namespace std;
+
+
+class Complex_number
+{
+public:
+	int a;
+	int result;
+	
+	friend void Scan(Complex_number& scan);			// Дружественная функция
+	friend void Print(Complex_number& print);		// Дружественная функция
+	friend void PrintRes(int res);					// Дружественная функция
+
+public:
+	Complex_number()								// Конструктор по умолчанию
+	{
+		cout << "Вызвался конструктор по умолчанию\t" << this << endl;
+	}
+
+	Complex_number(int size)						// Конструктор с параметрами
+	{
+		cout << "Вызвался конструктор с параметрами\t" << this << endl;
+	}
+
+	Complex_number(const Complex_number& other)		// Конструктор копирования
+	{
+		cout << "Вызвался конструктор копирования\t" << this << endl;
+	}
+
+
+
+
+	void operator = (const Complex_number& other)	// =
+	{
+		cout << "Вызвался оператор =\t\t\t" << this << endl;
+
+		a = other.a;
+	}
+
+	int operator + (const Complex_number& other)	// +
+	{
+		cout << "Вызвался оператор +\t\t\t" << this << endl;
+
+		result = a + other.a;
+
+		return result;
+	}
+
+	int operator * (const Complex_number& other)	// *
+	{
+		cout << "Вызвался оператор *\t\t\t" << this << endl;
+
+		result = (a * other.a) * (-1);
+
+		return result;
+	}
+
+	int operator - (const Complex_number& other)	// -
+	{
+		cout << "Вызвался оператор -\t\t\t" << this << endl;
+
+		result = a - other.a;
+
+		return result;
+	}
+
+
+
+
+	~Complex_number()							// Деструктор
+	{
+		cout << "Вызвался деструктор\t\t\t" << this << endl;
+	}
+};
+
+void Scan(Complex_number& scan)
+{
+	cout << "Ввод числа:\t"; cin >> scan.a;
+}
+
+void Print(Complex_number& print)
+{
+	cout << "Вывод числа:\t" << print.a << "*i" << endl;
+}
+
+void PrintRes(int res)
+{
+	cout << "Результат:\t" << res << "*i" << endl;
+}
+
+void PrintResMult(int res)	// Исключение для оператора *
+{
+	cout << "Результат:\t" << res << endl;
+}
+
+void PrintOpResults(Complex_number& valA, Complex_number& valB, char &_A, char _B)
+{
+	int result;				// Результат операций + * - =
+	char _C = _A;
+
+	result = valA.operator+(valB);
+	cout << _A << " + " << _B << endl;
+	PrintRes(result);
+
+	cout << endl;
+
+	result = valA.operator*(valB);
+	cout << _A << " * " << _B << endl;
+	PrintResMult(result);
+
+	cout << endl;
+
+	result = valA.operator-(valB);
+	cout << _A << " - " << _B << endl;
+	PrintRes(result);
+
+	cout << endl;
+
+	valA.operator=(valB);
+	cout << _A << " = " << _B << endl;
+	Print(valA);
+
+	_A = _B;
+	_B = _C;
+}
+
+int main()
+{
+	setlocale(LC_ALL, "ru");
+	
+	Complex_number A;
+	Complex_number B;
+	char ChA = 'A'; char ChB = 'B';
+
+	Scan(A); Print(A);
+	cout << endl;
+	Scan(B); Print(B);
+	int rem = A.a;		// Запоминаем число 1
+
+	cout << endl << "######################" << endl << endl;
+
+	PrintOpResults(A, B, ChA, ChB);
+
+	A.a = rem;
+	cout << endl << "######################" << endl << endl;
+
+	PrintOpResults(B, A, ChA, ChB);
+
+	cout << endl << "######################" << endl << endl;
+	return 0;
+}
