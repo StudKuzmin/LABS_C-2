@@ -1,0 +1,241 @@
+#include <iostream>
+#include <windows.h>
+#include <math.h>
+
+using namespace std;
+
+
+class Complex_number
+{
+private:
+	int a, b;
+	int result;
+	int x, y;
+	
+	friend void Scan(Complex_number& scan);			// Дружественная функция
+	friend void Print(Complex_number& print);		// Дружественная функция
+
+public:
+	Complex_number()								// Конструктор по умолчанию
+	{
+		cout << "Вызвался конструктор по умолчанию\t" << this << endl;
+	}
+	Complex_number(int a)							// Конструктор с параметрами
+	{
+		cout << "Вызвался конструктор с параметрами\t" << this << endl;
+
+		this->a = a;
+	}
+	Complex_number(int x, int y)					// Конструктор с параметрами
+	{
+		cout << "Вызвался конструктор с параметрами\t" << this << endl;
+
+		this->x = x;
+		this->y = y;
+	}
+	Complex_number(const Complex_number& other)		// Конструктор копирования
+	{
+		cout << "Вызвался конструктор копирования\t" << this << endl;
+
+		a = other.a;
+		b = other.b;
+		result = other.result;
+	}
+
+
+
+
+	void Set_a(int value_a)		// Сеттер a
+	{
+		a = value_a;
+	}
+	void Set_b(int value_b)		// Сеттер b
+	{
+		b = value_b;
+	}
+	int Get_a()					// Геттер a 
+	{
+		return a;
+	}
+	int Get_b()					// Геттер b
+	{
+		return b;
+	}
+
+
+
+
+	bool operator == (const Complex_number& other)
+	{
+
+	}
+
+	void operator = (const Complex_number& other)	// =
+	{
+		cout << "Вызвался оператор =\t\t\t" << this << endl;
+
+		a = other.a;
+		b = other.b;
+	}
+	int operator + (const Complex_number& other)	// +
+	{
+		cout << "Вызвался оператор +\t\t\t" << this << endl;
+
+		result = a + other.a;
+
+		return result;
+	}
+	int operator * (const Complex_number& other)	// *
+	{
+		cout << "Вызвался оператор *\t\t\t" << this << endl;
+
+		result = (a * other.a);
+
+		return result;
+	}
+	int operator - (const Complex_number& other)	// -
+	{
+		cout << "Вызвался оператор -\t\t\t" << this << endl;
+
+		result = a - other.a;
+
+		return result;
+	}
+
+
+
+
+	~Complex_number()							// Деструктор
+	{
+		cout << "Вызвался деструктор\t\t\t" << this << endl;
+	}
+};
+
+void Scan(Complex_number& scan)		// Дружественная функция ввода числа
+{
+	cout << "Ввод числа:\t\t"; cin >> scan.a;
+	cout << "Ввод мнимой части:\t"; cin >> scan.b;
+}
+void Print(Complex_number& print)	// Дружественная функция вывода числа
+{
+	if (print.b > 0) cout << "Вывод числа:\t\t" << print.a << "+" << print.b << "*i" << endl;
+	else if (print.b == 0) cout << "Вывод числа:\t\t" << print.a << endl;
+	else cout << "Вывод числа:\t\t" << print.a << print.b << "*i" << endl;
+}
+void PrintRes1(int res)				// 
+{
+	cout << "Результат:\t\t" << res;
+}
+void PrintRes2(int res)				//
+{
+	if (res > 0) cout << " + " << res << "*i" << endl;
+	else if (res == 0) cout << endl;
+	else cout << res << "*i" << endl;
+}
+void PrintResM_i(int res)			// 
+{
+	cout << "Результат:\t\t" << res << endl;
+}
+void PrintOpResults(Complex_number& valA, Complex_number& valB, char &_A, char &_B)	// Вывод операций 
+{
+	int result1;					// Результат операций + * - =
+	int result2;
+	char _C = _A;
+
+	result1 = valA.operator+(valB);
+	cout << _A << " + " << _B << endl;
+	PrintRes1(result1);
+	result2 = valA.Get_b() + valB.Get_b();
+	PrintRes2(result2);
+
+	cout << endl;
+
+	result1 = valA.operator*(valB);
+	cout << _A << " * " << _B << endl;
+	result2 = (valA.Get_b() * valB.Get_b()) * (-1) + result1;
+	PrintResM_i(result2);
+
+	cout << endl;
+
+	result1 = valA.operator-(valB);
+	cout << _A << " - " << _B << endl;
+	PrintRes1(result1);
+	result2 = valA.Get_b() - valB.Get_b();
+	PrintRes2(result2);
+
+	cout << endl;
+
+	valA.operator=(valB);
+	cout << _A << " = " << _B << endl;
+	Print(valA);
+
+	_A = _B;
+	_B = _C;
+}
+void ModuleVect(Complex_number& valAB)
+{
+
+}
+
+
+int main()
+{
+	setlocale(LC_ALL, "ru");
+
+	Complex_number A;			// Конструктор по умолчанию A
+	Complex_number B;			// Конструктор по умолчанию B
+	char ChA = 'A'; char ChB = 'B';
+
+	Scan(A); Print(A);
+	cout << endl;
+	Scan(B); Print(B);
+	int saveA = A.Get_a();		// Запоминаем число A
+	int saveB = B.Get_a();		// Запоминаем число B
+
+	cout << endl << "######################" << endl << endl;
+	PrintOpResults(A, B, ChA, ChB);
+	cout << endl << "######################" << endl << endl; A.Set_a(saveA);
+	PrintOpResults(B, A, ChA, ChB);
+	cout << endl << "######################" << endl << endl; B.Set_a(saveB);
+
+
+	//Complex_number Par_A(4);	// Конструктор с параметрами Par_A
+	//Complex_number Par_B(2);	// Конструктор с параметрами Par_B
+	//saveA = Par_A.Get_a();		// Запоминаем число Par_A
+	//saveB = Par_B.Get_a();		// Запоминаем число Par_B
+	//ChA = 'A'; ChB = 'B';
+
+	//Print(Par_A);
+	//cout << endl;
+	//Print(Par_B);
+
+	//cout << endl << "######################" << endl << endl;
+	//PrintOpResults(Par_A, Par_B, ChA, ChB);
+	//cout << endl << "######################" << endl << endl; Par_A.Set_a(saveA);
+	//PrintOpResults(Par_B, Par_A, ChA, ChB);
+	//cout << endl << "######################" << endl << endl; Par_B.Set_a(saveB);
+
+
+	//Complex_number Cop_A(B);	// Конструктор копирования Cop_B
+	//ChA = 'A'; ChB = 'B';
+	//Print(Cop_A);
+
+	//cout << endl << "######################" << endl << endl;
+	//PrintOpResults(Cop_A, B, ChA, ChB);
+	//cout << endl << "######################" << endl << endl;
+	//PrintOpResults(B, Cop_A, ChA, ChB);
+	//cout << endl << "######################" << endl << endl;
+
+	//bool bl; cout << "Очистить? "; cin >> bl;
+	//if (bl) system("CLS");
+
+	//int f, g, i1, i2;
+	//cout << "Введите комплексные числа: ";
+	//cout << "Число 1:\t"; cin >> f; cout << "i:\t"; cin >> i1;
+	//cout << "Число 2:\t"; cin >> g; cout << "i:\t"; cin >> i2;
+
+	
+	/*Complex_number AB(1, 2);*/
+
+	return 0;
+}
