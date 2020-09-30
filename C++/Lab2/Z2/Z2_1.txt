@@ -1,0 +1,115 @@
+#include <iostream>
+#include <windows.h>
+#include <math.h>
+#include <vector>
+
+using namespace std;
+
+class vect
+{
+private:
+	int n;
+	vector<int> res{ 0, 0 };		// Вектор, хранящий результат операций v1 и v2
+	vector<int> v{ 0, 0 };
+
+	friend void scan(vect& A);								// Дружественная функция ввода координат
+	friend istream& operator >>(istream& in, vect& other);	// Дружественная функция || Перегрузка >>
+	friend ostream& operator <<(ostream& ut, vect& other);	// Дружественная функция || Перегрузка <<
+	friend void ResV(const vect& R);						// Дружественная функция вывода результата операций над v1 и v2
+	friend void CinNumb(const vect& AB);					// Дружественная функция ввода числа n * v
+
+public:
+	vect()								// Конструктор по умолчанию
+	{
+		cout << "Вызвался конструктор по умолчанию\t\t" << this << endl;
+	}
+	vect(int x, int y)					// Конструктор с параметрами
+	{
+		cout << "Вызвался конструктор с параметрами\t\t" << this << endl;
+
+		this->v[0] = x;
+		this->v[1] = y;
+	}
+	vect(const vect& other)				// Конструктор копирования
+	{
+		cout << "Вызвался конструктор копирования\t\t" << this << endl;
+
+		res[0] = other.res[0];	// Копируем результаты A в Cop_A
+		res[1] = other.res[1];	// Копируем результаты A в Cop_A
+	}
+
+
+	vector <int> operator + (const vect& other)	// +
+	{
+		cout << "Вызвался оператор +\t\t\t\t" << this << endl;
+
+		res[0] = v[0] + other.v[0];
+		res[1] = v[1] + other.v[1];
+
+		return res;
+	}
+	vector <int> operator * (const vect& other)	// *
+	{
+		cout << "Вызвался оператор *\t\t\t\t" << this << endl;
+		cout << "Введите число:\t"; cin >> n;
+
+		res[0] = n * other.res[0];
+		res[1] = n * other.res[1];
+
+		return res;
+	}
+
+
+	~vect()								// Деструктор
+	{
+		cout << "Вызвался деструктор\t\t\t\t" << this << endl;
+	}
+};
+
+
+ostream& operator <<(ostream& ut, vect& other) // Дружественная функция ввода вектора || Перегрузка <<
+{
+	ut << "vect = " << "{ " << other.v[0] << ", " << other.v[1] << " }" << endl;
+
+	return ut;
+}
+istream& operator >>(istream& in, vect& other) // Дружественная функция ввода вектора || Перегрузка >>
+{
+	cout << "x:\t"; in >> other.v[0];
+	cout << "y:\t"; in >> other.v[1];
+
+	return in;
+}
+
+void ResV(const vect& R)
+{
+	cout << "Результат:\t" << "{ " << R.res[0] << ", " << R.res[1] << " }" << endl << endl;
+}
+
+int main()
+{
+	setlocale(LC_ALL, "ru");
+
+	vect A;
+	vect B;
+
+	cout << "Vect A: " << endl; cin >> A;
+	cout << A << endl;
+
+	cout << "Vect B: " << endl; cin >> B;
+	cout << B << endl;
+
+	A.operator+(B);
+	ResV(A);
+
+	vect Cop_A(A);	// Копируем A
+
+	A.operator*(Cop_A); 
+	ResV(A);
+
+
+
+
+	cout << endl;
+	return 0;
+}
