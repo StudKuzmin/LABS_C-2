@@ -1,0 +1,197 @@
+#include <iostream>
+#include <windows.h>
+#include <math.h>
+#include <vector>
+
+using namespace std;
+
+class matrx
+{
+private:
+	int rows, cols;
+	int** mtr;
+
+
+	friend istream& operator >>(istream& in, matrx& other);			// Дружественная функция ввода вектора || Перегрузка >>
+	friend ostream& operator <<(ostream& ut, matrx& other);			// Дружественная функция ввода вектора || Перегрузка <<
+
+public:
+	matrx()															// Конструктор по умолчанию
+	{
+		cout << "Вызвался конструктор по умолчанию\t\t" << this << endl;
+		
+	}
+	matrx(int rows, int cols)										// Конструктор с параметрами
+	{
+		cout << "Вызвался конструктор с параметрами\t\t" << this << endl;
+
+		this->rows = rows;
+		this->cols = cols;
+		for (int i = 0; i < rows; i++) // Присваиваем i строке динамический массив
+		{
+			mtr[i] = new int[cols];
+		}
+
+	}
+	matrx(const matrx& other)										// Конструктор копирования
+	{
+		cout << "Вызвался конструктор копирования\t\t" << this << endl;
+
+		rows = other.rows;
+		cols = other.cols;
+
+		mtr = new int* [rows];
+		for (int i = 0; i < rows; i++)
+		{
+			mtr[i] = new int[cols];
+		}
+
+		for (int i = 0; i < rows; i++)
+		{
+			for (int j = 0; j < cols; j++)
+			{
+				mtr[i][j] = other.mtr[i][j];
+			}
+		}
+	}
+	
+	matrx operator + (const matrx& other)	// Сложения матриц
+	{
+		cout << "Вызвался оператор сложения матриц\t\t" << this << endl;
+		matrx temp;							// Временный объект temp
+
+		temp.rows = rows;
+		temp.cols = cols;
+		temp.mtr = new int* [temp.rows];
+		for (int i = 0; i < temp.rows; i++)
+		{
+			temp.mtr[i] = new int[temp.cols];
+		}
+
+		if (rows != other.rows || cols != other.cols)
+		{
+			cout << "Матрицы должны иметь одинаковую длину строк и столбцов" << endl;
+			return temp;
+		}
+
+		for (int i = 0; i < temp.rows; i++)
+		{
+			for (int j = 0; j < temp.cols; j++)
+			{
+				temp.mtr[i][j] = mtr[i][j] + other.mtr[i][j];
+			/*	cout << temp.mtr[i][j] << "\t";*/
+			}
+			/*cout << endl;*/
+		}
+
+		return temp;
+	}
+	matrx operator * (const matrx& other)	// Умножение матрицы на число
+	{
+		cout << "Вызвался оператор сложения матриц\t\t" << this << endl;
+		matrx temp;							// Временный объект temp
+
+		int n;
+		cout << "Введите число:\t"; cin >> n;
+		temp.rows = rows;
+		temp.cols = cols;
+		temp.mtr = new int* [temp.rows];
+		for (int i = 0; i < temp.rows; i++)
+		{
+			temp.mtr[i] = new int[temp.cols];
+		}
+
+		for (int i = 0; i < temp.rows; i++)
+		{
+			for (int j = 0; j < temp.cols; j++)
+			{
+				temp.mtr[i][j] = other.mtr[i][j]*n;
+			}
+		}
+
+		return temp;
+	}
+
+
+
+
+	~matrx()										// Деструктор
+	{
+		cout << "Вызвался деструктор\t\t\t\t" << this << endl;
+
+		for (int i = 0; i < rows; i++)
+		{
+			delete[] mtr[i];
+		}
+		delete[] mtr;
+	}
+};
+
+
+ostream& operator <<(ostream& ut, matrx& other) // Дружественная функция вывода матрицы || Перегрузка <<
+{
+	ut << "Матрица: " << endl;
+
+	for (int i = 0; i < other.rows; i++)
+	{
+		for (int j = 0; j < other.cols; j++)
+		{
+			ut << other.mtr[i][j] << "\t";
+		}
+		ut << endl;
+	}
+
+	return ut;
+}
+istream& operator >>(istream& in, matrx& other) // Дружественная функция ввода матрицы || Перегрузка >>
+{
+	cout << endl << "Размер матрицы." << endl;
+	cout << "Строки:\t\t"; in >> other.rows;
+	cout << "Столбцы:\t"; in >> other.cols;
+
+	other.mtr = new int* [other.rows];
+
+	for (int i = 0; i < other.rows; i++) // Присваиваем i строке динамический массив
+	{
+		other.mtr[i] = new int[other.cols];
+	}
+
+	cout << endl << "Заполнение.." << endl;
+	for (int i = 0; i < other.rows; i++)
+	{
+		for (int j = 0; j < other.cols; j++)
+		{
+			other.mtr[i][j] = rand() % 10;
+		}
+	}
+
+
+	return in;
+}
+
+
+
+
+int main()
+{
+	setlocale(LC_ALL, "ru");
+
+	matrx A, B;
+
+	cout << endl << "###################################";
+	cin >> A;
+	cout << A;
+	cin >> B;
+	cout << B;
+	cout << "###################################" << endl << endl;
+
+	matrx t(A.operator+(B));	// Здесь вызывается конструктор копирования Копируем в объект t временный объект temp.
+	cout << endl << "Сложение 2х матриц." << endl << t;
+	cout << endl;
+	matrx t1(A.operator*(t));
+	cout << endl << "Умножение матрицы на число." << endl << t1;
+	cout << endl;
+
+	cout << endl;
+	return 0;
+}
