@@ -1,0 +1,277 @@
+#include <iostream>
+#include <windows.h>
+#include <math.h>
+#include <vector>
+
+using namespace std;
+
+class matrx
+{
+private:
+	int rows, cols;
+	int** mtr;
+
+
+	friend istream& operator >>(istream& in, matrx& other);								// Дружественная функция ввода матрицы || Перегрузка >>
+	friend ostream& operator <<(ostream& ut, matrx& other);								// Дружественная функция вывода матрицы || Перегрузка <<
+	friend bool matr_M_vect( matrx& res, const matrx& matr, const matrx& vect);			// Дружественная функция перемножения матрицы и вектора
+
+public:
+	matrx()															// Конструктор по умолчанию
+	{
+		cout << "Вызвался конструктор по умолчанию\t\t" << this << endl;
+
+	}
+	matrx(int rows, int cols)										// Конструктор с параметрами
+	{
+		cout << "Вызвался конструктор с параметрами\t\t" << this << endl;
+
+		this->rows = rows;
+		this->cols = cols;
+		for (int i = 0; i < rows; i++) // Присваиваем i строке динамический массив
+		{
+			mtr[i] = new int[cols];
+		}
+
+	}
+	matrx(const matrx& other)										// Конструктор копирования
+	{
+		cout << "Вызвался конструктор копирования\t\t" << this << endl;
+
+		rows = other.rows;
+		cols = other.cols;
+
+		mtr = new int* [rows];
+		for (int i = 0; i < rows; i++)
+		{
+			mtr[i] = new int[cols];
+		}
+
+		for (int i = 0; i < rows; i++)
+		{
+			for (int j = 0; j < cols; j++)
+			{
+				mtr[i][j] = other.mtr[i][j];
+			}
+		}
+	}
+
+	matrx operator + (const matrx& other)	// Сложения матриц
+	{
+		cout << "Вызвался оператор сложения матриц\t\t" << this << endl;
+		matrx temp;							// Временный объект temp
+
+		temp.rows = rows;
+		temp.cols = cols;
+		temp.mtr = new int* [temp.rows];
+
+		for (int i = 0; i < temp.rows; i++)
+		{
+			temp.mtr[i] = new int[temp.cols];
+			for (int j = 0; j < temp.cols; j++)
+			{
+				temp.mtr[i][j] = 0;
+			}
+		}
+
+		if (rows != other.rows || cols != other.cols)
+		{
+			cout << "!!Матрицы должны иметь одинаковую длину строк и столбцов для сложения." << endl;
+			return temp;
+		}
+
+		for (int i = 0; i < temp.rows; i++)
+		{
+			for (int j = 0; j < temp.cols; j++)
+			{
+				temp.mtr[i][j] = mtr[i][j] + other.mtr[i][j];
+			}
+		}
+
+		return temp;
+	}
+	matrx operator * (const matrx& other)	// Перемножение матриц
+	{
+		cout << "Вызвался оператор умножения матриц\t\t" << this << endl;
+		matrx temp;							// Временный объект temp
+
+		temp.rows = rows;
+		temp.cols = other.cols;
+		temp.mtr = new int* [temp.rows];
+
+		if (cols != other.rows)
+		{
+			cout << "!!Количество столбцов матрицы A != количеству строк матрицы B." << endl;
+			cout << "!!Программа завершается.." << endl;
+			exit(0);
+		}
+	
+		for (int i = 0; i < temp.rows; i++) 
+		{
+			temp.mtr[i] = new int[temp.cols];
+			for (int j = 0; j < temp.cols; j++) 
+			{
+				temp.mtr[i][j] = 0;
+				for (int k = 0; k < cols; k++)
+				{
+					temp.mtr[i][j] += mtr[i][k] * other.mtr[k][j];
+				}
+			}
+		}
+
+		return temp;
+	}
+
+	void Mult(int value)	// Умножение матрицы на число
+	{
+		for (int i = 0; i < rows; i++)
+		{
+			for (int j = 0; j < cols; j++)
+			{
+				mtr[i][j] = mtr[i][j] * value;
+			}
+		}
+	}
+	void ZapV(const matrx& other)	// Заполнение вектора
+	{
+		rows = other.cols;	// Количество строк вектора V = количеству столбцов матрицы A
+		cols = 1;			// Количество столбцов вектора V = 1
+
+		mtr = new int* [rows];
+
+		for (int i = 0; i < rows; i++)
+		{
+			mtr[i] = new int[cols];
+			for (int j = 0; j < cols; j++)
+			{
+				mtr[i][j] = rand() % 10;
+			}
+		}
+	}
+
+
+
+
+	~matrx()										// Деструктор
+	{
+		cout << "Вызвался деструктор\t\t\t\t" << this << endl;
+
+		for (int i = 0; i < rows; i++)
+		{
+			delete[] mtr[i];
+		}
+		delete[] mtr;
+	}
+};
+
+
+ostream& operator <<(ostream& ut, matrx& other) // Дружественная функция вывода матрицы || Перегрузка <<
+{
+	for (int i = 0; i < other.rows; i++)
+	{
+		for (int j = 0; j < other.cols; j++)
+		{
+			ut << other.mtr[i][j] << "\t";
+		}
+		ut << endl;
+	}
+
+	return ut;
+}
+istream& operator >>(istream& in, matrx& other) // Дружественная функция ввода матрицы || Перегрузка >>
+{
+	cout << endl << "Размер матрицы." << endl;
+	cout << "Строки:\t\t"; in >> other.rows;
+	cout << "Столбцы:\t"; in >> other.cols;
+
+	other.mtr = new int* [other.rows];
+
+	for (int i = 0; i < other.rows; i++) // Присваиваем i строке динамический массив
+	{
+		other.mtr[i] = new int[other.cols];
+	}
+
+	cout << endl << "Заполнение.." << endl;
+	for (int i = 0; i < other.rows; i++)
+	{
+		for (int j = 0; j < other.cols; j++)
+		{
+			other.mtr[i][j] = rand() % 10;
+		}
+	}
+
+
+	return in;
+}
+
+bool matr_M_vect( matrx& res, const matrx& matr, const matrx& vect)	// Умножение матрицы A на вектор V
+{
+	res.rows = matr.rows;
+	res.cols = 1;
+
+	if (matr.cols != vect.rows)
+	{
+		cout << "Количество столбцов матрицы != количеству строк вектора." << endl;
+		return false;
+	}
+
+	res.mtr = new int* [res.rows];
+
+	for (int i = 0; i < res.rows; i++)
+	{
+		res.mtr[i] = new int[res.cols];
+		for (int j = 0; j < res.cols; j++)
+		{
+			res.mtr[i][j] = 0;
+			for (int k = 0; k < matr.cols; k++)
+			{
+				res.mtr[i][j] += matr.mtr[i][k] * vect.mtr[k][j];
+			}
+		}
+	}
+
+	return true;
+}
+
+
+int main()
+{
+	setlocale(LC_ALL, "ru");
+
+	matrx A, B;
+
+	cout << endl << "###################################";
+	cin >> A;
+	cout << "Матрица:" << endl << A;
+	cin >> B;
+	cout << "Матрица:" << endl << B;
+	cout << "###################################" << endl << endl;
+
+	matrx t(A.operator+(B));	// Здесь вызывается конструктор копирования. Копируем в объект t временный объект temp - результат сложения (+) матриц
+	cout << endl << "Сложение 2х матриц." << endl << t;
+	cout << endl;
+	matrx t1(A.operator*(B));	// Здесь вызывается конструктор копирования. Копируем в объект t1 временный объект temp - результат перемножения (*) матриц
+	cout << endl << "Перемножение 2х матриц." << endl << t1;
+	cout << endl; int n;
+	cout << "Введите число:\t"; cin >> n;
+	t1.Mult(n);
+	cout << "Умножение матрицы на число." << endl << t1;
+
+	cout << endl << "Очистить? ";
+	bool bl; cin >> bl; if (bl) system("CLS");
+
+	matrx V; 
+	matrx Res;	// Результат умножение матрицы A на вектор V
+	V.ZapV(A);	// Заполнение вектора V || Параметр A, потому что умножаем матрицу A на вектор V (можно вместо A поставить любую матрицу)
+
+	cout << "Матрица:" << endl << A;
+	cout << "Вектор:" << endl << V;
+	matr_M_vect(Res, A, V);
+	cout << endl;
+	cout << "Умножение матрицы на вектор." << endl;
+	cout << Res << endl;
+	
+
+	cout << endl;
+	return 0;
+}
