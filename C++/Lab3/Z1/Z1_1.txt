@@ -1,0 +1,94 @@
+#include <iostream>
+#include <windows.h>
+#include <math.h>
+
+
+using namespace std;
+
+class complex
+{
+private:
+	int x, y;
+
+public:
+
+};
+
+template <class T>
+class vector
+{
+private:
+	T* v;
+	int size;
+	double Module;
+
+	friend istream& operator >> (istream& in, vector<int>& other);		// Дружественная функция || перегрузка >>
+	friend ostream& operator << (ostream& ut, vector<int>& other);		// Дружественная функция || перегрузка <<
+
+public:
+	double ModuleVect()					// Вычисление длины вектора
+	{
+		for (int i = 0; i < size; i++)
+		{
+			Module = Module + v[i] * v[i];
+		}
+
+		return sqrt(Module);
+	}
+
+	void ident()						// Объявление динамического массива
+	{
+		v = new T[size];
+	}
+
+	~vector()
+	{
+		delete[] v;
+	}
+};
+
+istream& operator >> (istream& in, vector<int>& other)	// Ввод вектора
+{
+	in >> other.size;	// Вводим размер вектора
+	other.ident();
+	//	other.v = new T[other.size]; 
+	//	НЕ РАБОТАЕТ ОБЪЯВЛЕНИЕ МАССИВА!!
+
+	for (int i = 0; i < other.size; i++)
+	{
+		other.v[i] = rand() % 10;
+	}
+
+	return in;
+}
+
+ostream& operator << (ostream& ut, vector<int>& other)	// Вывод вектора
+{
+	ut << "Вектор: ";
+	ut << "{ ";
+	for (int i = 0; i < other.size; i++)
+	{
+		if (i == other.size - 1)
+		{
+			ut << other.v[i];
+			break;
+		}
+		ut << other.v[i] << ", ";
+	}
+	ut << " }" << endl;
+
+	return ut;
+}
+
+int main()
+{
+	setlocale(LC_ALL, "ru");
+	
+	vector<int> A;
+	cin >> A;	// Ввод вектора
+	cout << A;	// Вывод вектора
+
+
+
+	return 0;
+}
