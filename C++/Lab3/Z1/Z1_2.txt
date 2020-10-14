@@ -7,12 +7,14 @@ using namespace std;
 
 class complex
 {
+public:
+	int** v;
 private:
-	int** v; int rows; int cols = 2; // 0 столбец - действительная часть, 1 столбец - мнимая часть
+	int rows; int cols = 2; // 0 столбец - действительная часть, 1 столбец - мнимая часть
 
-	friend ostream& operator << (ostream& ut, complex& other);	// Вывод комплексногых чисел
-	friend istream& operator >> (istream& in, complex& other);	// Ввод размера комплексных чисел и их инициализация
-	friend void funk(vector<complex> other, complex other2);				// Копирование количества комплексных чисел
+	friend ostream& operator << (ostream& ut, complex& other);			// Вывод комплексногых чисел
+	friend istream& operator >> (istream& in, complex& other);			// Ввод размера комплексных чисел и их инициализация
+
 public:
 	complex()
 	{
@@ -37,15 +39,21 @@ public:
 	{
 		return rows;
 	}
-
-	~complex()	// Деструктор
+	int** getV()	// Геттер v
 	{
+		return v;
+	}
+
+	~complex()	// деструктор
+	{
+		cout << "Деструктор\t" << this << endl;
 		for (int i = 0; i < rows; i++)
 		{
 			delete[] v[i];
 		}
-		delete[] v;
+		delete[] this->v;
 	}
+
 };
 
 template <class T>
@@ -62,7 +70,7 @@ private:
 public:
 	void ident()						// Объявление динамического массива
 	{
-		v = new T[size];
+		v = new T[rows];
 	}
 
 	~vector()
@@ -74,58 +82,75 @@ public:
 template <>
 class vector<complex>
 {
-private:
-	complex** v;
+public:
+	complex* ve;
 	int rows;
 	int cols = 2;
 	double Module;
 
-	friend istream& operator >> (istream& in, vector<complex>& other);		// Дружественная функция || перегрузка >>
-	friend ostream& operator << (ostream& ut, vector<complex>& other);		// Дружественная функция || перегрузка <<
-	friend void funk(vector<complex> other, complex other2);				// Копирование количества комплексных чисел
 public:
-	void ident()						// Объявление динамического массива
+	vector(complex& other)	// Конструктор копирования || копирование rows
 	{
-		v = new complex*[rows];
+		rows = other.getRows();
+		ve = new complex[rows];
+	}
 
+	void enter(complex& other)
+	{
+		int** Vc = new int*[rows];
 		for (int i = 0; i < rows; i++)
 		{
-			v[i] = new complex[cols];
+			Vc[i] = new int[cols];
 		}
-		
+		Vc = other.v;
+		cout << "1" << endl;
+		ve = new complex[rows];
+		cout << "2" << endl;
+
+	
+		for (int i = 0; i < rows; i++)
+		{
+			ve[i].v[i][0] = i;
+			cout << "Vot:" << endl;
+			ve[i].v[i][1] = i;
+		}
+
+		/*for (int i = 0; i < rows; i++)
+		{
+			cout << v[i].v[i][0] = Vc[i][0];
+		}*/
+	}
+
+	void ident()						// Объявление динамического массива
+	{
+		ve = new complex[rows];
 	}
 
 	
 	~vector()	// Деструктор
 	{
-		for (int i = 0; i < rows; i++)
-		{
-			delete[] v[i];
-		}
-		delete[] v;
+		delete[] ve;
 	}
 };
 
-void funk(vector<complex> other, complex other2)	// Копирование количества комплексных чисел
-{
-	other.rows = other2.getRows();
-}
-istream& operator >> (istream& in, vector<complex>& other)	// Ввод вектора
-{
-	other.ident();
-	
-	for (int i = 0; i < other.rows; i++)
-	{
-		for (int j = 0; j < other.cols; j++)
-		{
-			other.v[i][0] = 
-		}
-	}
 
-	
-
-	return in;
-}
+//istream& operator >> (istream& in, vector<complex>& other)	// Ввод вектора
+//{
+//	complex temp;
+//	other.ident(); // Объявление динамического массива
+//	
+//	for (int i = 0; i < other.rows; i++)
+//	{
+//		for (int j = 0; j < other.cols; j++)
+//		{
+//			other.v[i][0] =
+//		}
+//	}
+//
+//	
+//
+//	return in;
+//}
 ostream& operator << (ostream& ut, vector<complex>& other)	// Вывод вектора
 {
 	ut << "Вектор: ";
@@ -134,10 +159,10 @@ ostream& operator << (ostream& ut, vector<complex>& other)	// Вывод век�
 	{
 		if (i == other.rows - 1)
 		{
-			ut << other.v[i];
+			ut << other.ve[i];
 			break;
 		}
-		ut << other.v[i] << ", ";
+		ut << other.ve[i] << ", ";
 	}
 	ut << " }" << endl << endl;
 
@@ -182,10 +207,9 @@ int main()
 	cin >> Ac;	// Ввод размера и инициализация комплексных чисел
 	cout << Ac;	// Вывод комплексных чисел
 
-	vector<complex> A;
-	funk(A, Ac);// Копирование количества комплексных чисел
-	cin >> A;	// Ввод вектора
-	cout << A;	// Вывод вектора
+	vector<complex> A(Ac);
+	//A.enter(Ac);
+	//cout << A;	// Вывод вектора
 
 
 
