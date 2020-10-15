@@ -1,0 +1,154 @@
+#include <iostream>
+#include <windows.h>
+#include <math.h>
+
+using namespace std;
+
+
+template <class T>
+class set
+{
+	T* Arr_Set;		// Множество элементов типа данных T
+	int size;		// Размер множества элементов типа данных T
+
+	friend istream& operator >> (istream& in, set<int>& other);	// Ввод размера комплексных чисел и их инициализация
+	friend ostream& operator << (ostream& ut, set<int>& other);	// Вывод множества целых чисел
+public:
+	set()
+	{
+
+	}
+	set(const set& other)
+	{
+		size = other.size;		// Копируем в объект множества объединения M3 размер объектов множеств M1 + M2
+		Arr_Set = new T[size];
+		for (int i = 0; i < size; i++) // Копируем в Объект множества объединения M3 результаты объединения множества M1 и M2
+		{
+			Arr_Set[i] = other.Arr_Set[i];
+		}
+	}
+
+	void operator = (const set& other)	// Перегрузка оператора =
+	{
+		if (Arr_Set != nullptr) delete[] Arr_Set; // Если массив не пустой, то удаляем
+		size = other.size;
+		Arr_Set = new T[size];
+
+		for (int i = 0; i < size; i++) // Копируем в Объект множества объединения M3 результаты объединения множества M1 и M2
+		{
+			Arr_Set[i] = other.Arr_Set[i];
+		}
+	}
+
+	set Union(const set& other)
+	{
+		set temp;
+		int t1 = sizeof(Arr_Set) / sizeof(Arr_Set[0]); int t2 = sizeof(other.Arr_Set) / sizeof(other.Arr_Set[0]);
+		cout << sizeof(Arr_Set) << endl;
+		temp.size = size + other.size;
+		temp.Arr_Set = new T[temp.size]; // Множество объединения размером size M1 + M2
+
+		int i = 0;
+		for (; i < size; i++)
+		{
+			temp.Arr_Set[i] = Arr_Set[i];
+		}
+		for (int j = 0; j <= other.size; j++)
+		{
+			if (temp.Arr_Set[j] != other.Arr_Set[j])
+			{
+				temp.Arr_Set[i] = other.Arr_Set[j];
+				i++;
+			}
+		}
+
+		return temp;
+	}
+
+
+	~set()
+	{
+		delete[] Arr_Set;
+	}
+};
+
+istream& operator >> (istream& in,set<int>& other)	// Ввод размера множества целых чисел и их инициализация
+{
+	 in >> other.size;
+	other.Arr_Set = new int[other.size];
+
+	for (int i = 0; i < other.size; i++)
+	{
+		other.Arr_Set[i] = rand() % 10;
+	}
+
+	return in;
+}
+ostream& operator << (ostream& ut, set<int>& other)	// Вывод множества целых чисел
+{
+	ut << " { ";
+	for (int i = 0; i < other.size; i++)
+	{
+		ut << other.Arr_Set[i];
+		if (i != other.size - 1) ut << ", ";
+	}
+	ut << " }";
+
+	return ut << endl << endl;
+}
+
+char select()
+{
+	char a;
+	cout << "Какой тип данных элементов множества вы хотите использовать?" << endl;
+	cout << "i - int, d - double, c - char" << endl; cin >> a;
+	return a;
+}
+int main()
+{
+	setlocale(LC_ALL, "ru");
+
+	set<int> A;
+	cout << "Введите количество целых элементов множества A:\t"; cin >> A;
+	cout << "Множество A:"; cout << A;
+
+	set<int> B;
+	cout << "Введите количество целых элементов множества B:\t"; cin >> B;
+	cout << "Множество B:"; cout << B;
+
+	set<int> M_Union;
+	M_Union = A.Union(B);
+	cout << "Множество A и B" << M_Union;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	//switch (select())
+	//{
+	//case 'i':
+	//	cout << "Это int" << endl;
+	//	break;
+	//case 'd':
+	//	cout << "Это double" << endl;
+	//	break;
+	//case 'c':
+	//	cout << "Это char" << endl;
+	//	break;
+	//default:
+	//	cout << "Таких типов данных нет" << endl;
+	//}
+
+	return 0;
+}
