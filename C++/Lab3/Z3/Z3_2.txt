@@ -1,0 +1,457 @@
+#include <iostream>
+#include <windows.h>
+#include <math.h>
+#include <fstream>
+#include <ctime>
+#define GREEN SetConsoleTextAttribute(name, FOREGROUND_RED)
+#define WHITE SetConsoleTextAttribute(name, FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN)
+
+using namespace std;
+
+
+template <class T>
+class set
+{
+	T* Arr_Set;			// Множество элементов типа данных T
+	int size;			// Размер множества элементов типа данных T
+
+	friend istream& operator >> (istream& in, set<int>& other);		// Ввод размера комплексных чисел и их инициализация
+	friend ostream& operator << (ostream& ut, set<int>& other);		// Вывод множества целых чисел
+	friend void Largest_set_of_numbers(set<int>*& M, int size);		// Ищем наибольшее множество
+	friend char funk_set_names();									// Имена для множеств
+	friend bool presence_of_item(set<int>*& M);						// Проверка на наличие элементов при операции пересечения M1 и M2
+public:
+	char name;	// Название множества
+
+public:
+	set()
+	{
+
+	}
+	set(const set& other)
+	{
+		size = other.size;		// Копируем в объект множества объединения размер temp.size
+		Arr_Set = new T[size];
+		for (int i = 0; i < size; i++) // Копируем в Объект множества объединения M3 результаты объединения множества M1 и M2
+		{
+			Arr_Set[i] = other.Arr_Set[i];
+		}
+	}
+
+	void operator = (const set& other)	// Перегрузка оператора =
+	{
+		if (Arr_Set != nullptr) delete[] Arr_Set; // Если массив не пустой, то удаляем
+		size = other.size;
+		Arr_Set = new T[size];
+
+		for (int i = 0; i < size; i++) // Копируем в Объект множества объединения M3 результаты объединения множества M1 и M2
+		{
+			Arr_Set[i] = other.Arr_Set[i];
+		}
+	}
+
+	set Union(const set& other)			// Метод объединения множеств
+	{
+		set temp;
+
+		int n = 0;
+		T* arr = new T[size + other.size];		// Массив, в который будет копировать все элементы множества M1 и M2
+		for (int i = 0; i < size; i++)			// Добавляем M1 в массив множество объединения
+		{
+			arr[i] = Arr_Set[i];
+			n++;
+		}
+		for (int i = 0; i < other.size; i++)	// Добавляем M2 в массив множество объединения
+		{
+			arr[n] = other.Arr_Set[i];
+			n++;
+		}
+		temp.size = n;
+		temp.Arr_Set = new T[temp.size];		// Множество объединения размером size M1 + M2
+		int k = 0;
+		for (int i = 0; i < n; i++)				// Сортируем
+		{
+			for (int i = 0; i < n - 1; i++)
+			{
+				if (arr[i] > arr[i + 1]) swap(arr[i], arr[i + 1]);
+			}
+		}
+		int j = 0;
+		for (int i = 0; i < n; i++)				// Исключаем элементы-дубликаты
+		{
+			if (i == n - 1) temp.Arr_Set[j] = arr[i];
+			else if (arr[i] != arr[i + 1])
+			{
+				temp.Arr_Set[j] = arr[i];
+				j++;
+			}
+		}
+
+		delete[] arr;
+
+		temp.size = j + 1; // Задаём новый размер множеству объединения
+		temp.Arr_Set = (T*)realloc(temp.Arr_Set, temp.size * sizeof(T)); // Изменяем размер динамической памяти массива
+		return temp;
+	}
+	set Intersection(const set& other)		// Метод пересечения множеств
+	{
+		set temp;
+
+		int sizeM1 = size; int sizeM2 = other.size;
+		T* arrM1 = new T[sizeM1];			//	M1
+		T* arrM2 = new T[sizeM2];			//	M2
+		for (int i = 0; i < sizeM1; i++)	// Копируем массив M1
+		{
+			arrM1[i] = Arr_Set[i];
+		}
+		for (int i = 0; i < sizeM2; i++)	// Копируем массив M2
+		{
+			arrM2[i] = other.Arr_Set[i];
+		}
+		for (int i = 0; i < sizeM1; i++)			// Сортируем M1
+		{
+			for (int i = 0; i < sizeM1 - 1; i++)
+			{
+				if (arrM1[i] > arrM1[i + 1]) swap(arrM1[i], arrM1[i + 1]);
+			}
+		}
+		for (int i = 0; i < sizeM2; i++)			// Сортируем M2
+		{
+			for (int i = 0; i < sizeM2 - 1; i++)
+			{
+				if (arrM2[i] > arrM2[i + 1]) swap(arrM2[i], arrM2[i + 1]);
+			}
+		}
+
+		int j = 0;
+		int sizeA1 = sizeM1;
+		T* arr1 = new T[sizeA1];
+		for (int i = 0; i < sizeA1; i++)				// Исключаем элементы-дубликаты из множества M1
+		{
+			if (i == sizeA1 - 1) arr1[j] = arrM1[i];
+			else if (arrM1[i] != arrM1[i + 1])
+			{
+				arr1[j] = arrM1[i];
+				j++;
+			}
+		}
+		sizeA1 = j + 1;
+
+		j = 0;
+		int sizeA2 = sizeM2;
+		T* arr2 = new T[sizeA2];
+		for (int i = 0; i < sizeA2; i++)				// Исключаем элементы-дубликаты из множества M2
+		{
+			if (i == sizeA2 - 1) arr2[j] = arrM2[i];
+			else if (arrM2[i] != arrM2[i + 1])
+			{
+				arr2[j] = arrM2[i];
+				j++;
+			}
+		}
+		sizeA2 = j + 1;
+
+		// arr1 и arr2 хранят в себе разные элементы по возрастанию
+		int n = 0;
+		T* arr = new T[sizeA1 + sizeA2];			// Массив, в который будут копироваться все элементы множества M1 и M2
+		for (int i = 0; i < sizeA1; i++)			// Добавляем M1 в массив множество объединения
+		{
+			arr[i] = arr1[i];
+			n++;
+		}
+		for (int i = 0; i < sizeA2; i++)	// Добавляем M2 в массив множество объединения
+		{
+			arr[n] = arr2[i];
+			n++;
+		}
+		temp.size = n;
+		temp.Arr_Set = new T[temp.size];		// Множество объединения размером size M1 + M2
+		for (int i = 0; i < n; i++)				// Сортируем
+		{
+			for (int i = 0; i < n - 1; i++)
+			{
+				if (arr[i] > arr[i + 1]) swap(arr[i], arr[i + 1]);
+			}
+		}
+		j = 0;
+		for (int i = 0; i < n; i++)				// Исключаем разные элементы
+		{
+			if (i == n - 1) break;
+			else if (arr[i] == arr[i + 1])
+			{
+				temp.Arr_Set[j] = arr[i];
+				j++;
+			}
+		}
+
+
+
+
+		delete[] arrM1;
+		delete[] arrM2;
+		delete[] arr;
+		delete[] arr1;
+		delete[] arr2;
+
+		temp.size = j; // Задаём новый размер множеству объединения
+		temp.Arr_Set = (T*)realloc(temp.Arr_Set, temp.size * sizeof(T)); // Изменяем размер динамической памяти массива
+		return temp;
+	}
+	void Add_Item()		// Метод добавления элемента в конец множества
+	{
+		size++;		// Увеличиваем размер множества на 1, т.к. добавляем элемент.
+		Arr_Set = (int*)realloc(Arr_Set, size * sizeof(int));
+
+		int item;
+		cout << "Добавляемый элемент:\t"; cin >> item;
+		Arr_Set[size - 1] = item;
+	}
+	void Del_Item()				// Метод удаления элемента
+	{
+		int item; int count = 0;
+		cout << "Удаляемый элемент:\t"; cin >> item;
+		for (int i = 0; i < size; i++)
+		{
+			if (Arr_Set[i] == item)	// Меняем местами удаляемый элемент и последний элемент множества, меняем размер size-1
+			{
+				Arr_Set[i] = Arr_Set[size-1];
+				Arr_Set[size - 1] = Arr_Set[i] - Arr_Set[size - 1];
+				Arr_Set[i] = Arr_Set[i] - Arr_Set[size - 1];
+				--size;		// Уменьшаем размер множества на 1, т.к. удаляем элемент.
+				++count;
+			}
+		}
+		if (count == 0) cout << "Такого элемента во множестве " << name << " Нет." << endl;
+
+		Arr_Set = (int*)realloc(Arr_Set, size * sizeof(int));
+	}
+	bool Search_Item()	// Метод, который проверяет, принадлежит ли элемент множеству
+	{
+		T item;
+		cout << "Какой элемент искать? "; cin >> item;
+
+		int count = 0;
+		for (int i = 0; i < size; i++)
+		{
+			if (Arr_Set[i] == item)
+			{
+				cout << "Да, такой элемент есть под индексом " << i << " !" << endl;
+				count++;
+			}
+		}
+		if (count != 0) return true;
+
+		cout << "Нет, данный элемент отсутствует в данном множестве." << endl;
+		return false;
+	}
+	void set_name()	// Метод имена для множеств
+	{
+		char arr[]{ 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N','O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
+		name = arr[rand() % 26];
+	}
+	bool Contains(const set& other)	// Метод, который проверяет, содержит ли множество M1 множество M2
+	{
+		int sizeM1 = size; int sizeM2 = other.size;
+		int *arrM1 = new int[sizeM1];			//	M1
+		int *arrM2 = new int[sizeM2];			//	M2
+		for (int i = 0; i < sizeM1; i++)	// Копируем массив M1
+		{
+			arrM1[i] = Arr_Set[i];
+		}
+		for (int i = 0; i < sizeM2; i++)	// Копируем массив M2
+		{
+			arrM2[i] = other.Arr_Set[i];
+		}
+		for (int i = 0; i < sizeM1; i++)			// Сортируем M1
+		{
+			for (int i = 0; i < sizeM1 - 1; i++)
+			{
+				if (arrM1[i] > arrM1[i + 1]) swap(arrM1[i], arrM1[i + 1]);
+			}
+		}
+		for (int i = 0; i < sizeM2; i++)			// Сортируем M2
+		{
+			for (int i = 0; i < sizeM2 - 1; i++)
+			{
+				if (arrM2[i] > arrM2[i + 1]) swap(arrM2[i], arrM2[i + 1]);
+			}
+		}
+
+		int j = 0;
+		int sizeA1 = sizeM1;
+		int *arr1 = new int[sizeA1];
+		for (int i = 0; i < sizeA1; i++)				// Исключаем элементы-дубликаты из множества M1
+		{
+			if (i == sizeA1 - 1) arr1[j] = arrM1[i];
+			else if (arrM1[i] != arrM1[i + 1])
+			{
+				arr1[j] = arrM1[i];
+				j++;
+			}
+		}
+		sizeA1 = j + 1;
+
+		j = 0;
+		int sizeA2 = sizeM2;
+		int* arr2 = new int[sizeA2];
+		for (int i = 0; i < sizeA2; i++)				// Исключаем элементы-дубликаты из множества M2
+		{
+			if (i == sizeA2 - 1) arr2[j] = arrM2[i];
+			else if (arrM2[i] != arrM2[i + 1])
+			{
+				arr2[j] = arrM2[i];
+				j++;
+			}
+		}
+		sizeA2 = j + 1;
+
+		int count = 0; 
+		for (int i = 0; i < sizeA2; i++)	// Считывание количество элементов множества пересечения
+		{
+			for (int j = 0; j < sizeA1; j++)
+			{
+				if (arr2[i] == arr1[j]) ++count;
+			}
+		}
+
+		delete[] arrM1;
+		delete[] arrM2;
+		delete[] arr1;
+		delete[] arr2;
+
+		if (count == other.size)
+		{
+			cout << "Множество " << name << " Содержит множество " << other.name << endl;
+			return true;
+		}
+		else
+		{
+			cout << "Множество " << name << " Не содержит множество " << other.name << endl; // Т.к. размер множества пересечения != размеру множества M2 
+			return false;
+		}
+	}
+
+	int getSize()
+	{
+		return size;
+	}
+
+
+
+	~set()
+	{
+		delete[] Arr_Set;
+	}
+};
+
+istream& operator >> (istream& in,set<int>& other)	// Ввод размера множества целых чисел и их инициализация
+{
+	ifstream ints;
+	ints.open("C:\\Users\\ahgin\\Desktop\\lab3\\M.txt");
+	if (!ints) cout << "Ошибка открытия файла M.txt" << endl;
+
+	int* ran = new int[255];
+	int k = 0;
+	while (!ints.eof())	// Считываем в массив все значения из файла
+	{
+		ints >> ran[k];
+		k++;
+	}
+
+	other.size = rand() % k;	// У каждого множество свой индивидуальный случайный размер
+	other.Arr_Set = new int[other.size];
+
+	int j = 0;
+	for (int i = 0; i < other.size; i++)	// Заполняем массив случайными значениями из файла
+	{
+		j = rand() % k;
+		other.Arr_Set[i] = ran[j];
+	}
+
+
+	ints.close();
+	return in;
+}
+ostream& operator << (ostream& ut, set<int>& other)	// Вывод множества целых чисел
+{
+	ut << " { ";
+	for (int i = 0; i < other.size; i++)
+	{
+		ut << other.Arr_Set[i];
+		if (i != other.size - 1) ut << ", ";
+	}
+	ut << " }";
+
+	return ut << endl;
+}
+
+void funk_set_names(set<int>*& M, int size)	// Даём имя каждому множеству
+{
+	for (int i = 0; i < size; i++)
+	{
+		M[i].set_name();
+	}
+}
+void Largest_set_of_numbers(set<int>*& M, int size) // Ищем наибольшее множество
+{
+	int max = 0;
+
+	for (int i = 0; i < size; i++)
+	{
+		if (max < M[i].size) max = M[i].size;
+	}
+
+	for (int i = 0; i < size; i++)
+	{
+		if (M[i].size == max)
+		{
+			cout << "Наибольшее множество:\t\t" << M[i].name << endl;
+			cout << "Количество его элементов:\t" << max << endl;
+		}
+	}
+}
+bool presence_of_item(set<int>*& M)		// Проверка на наличие элементов при операции пересечения M1 и M2
+{
+	set<int> M_Intersection;
+	M_Intersection = M[0].Intersection(M[1]);
+	if (M_Intersection.size != 0) // Если размер множества пересечения != 0, то они пересекаются
+	{
+		cout << "Множества " << M[0].name << " и " << M[1].name << " пересекаются: " << M_Intersection;
+
+		return true;
+	}
+	else
+	{
+		cout << "Множества " << M[0].name << " и " << M[1].name << " не пересекаются." << endl;
+
+		return false;
+	}
+	
+}
+int main()
+{
+	setlocale(LC_ALL, "ru"); srand(time(NULL));
+
+	//	Целые
+	int size = 3; // Т.к. 3 множества
+	set<int>* Set = new set<int>[size];
+	
+	funk_set_names(Set, size);	// Даём имя каждому множеству
+	for (int i = 0; i < size; i++)
+	{
+		cin >> Set[i]; cout << "Количество элементов множества " << Set[i].name << ":\t" << Set[i].getSize() << endl;  cout << "Множество " << Set[i].name << ":\t" << Set[i] << endl;
+	}
+
+	cout << "1." << endl;
+	Largest_set_of_numbers(Set, size);	// Ищем наибольшее множество
+	cout << "2." << endl; presence_of_item(Set);				// Проверка на наличие элементов при операции пересечения M1 и M2
+	Set[0].Contains(Set[1]);
+	Set[1].Contains(Set[0]);
+	cout << "3." << endl; 
+	Set[0].Add_Item(); cout << "Множество " << Set[0].name << ":\t" << Set[0];
+	Set[1].Del_Item(); cout << "Множество " << Set[1].name << ":\t" << Set[1] << endl;
+
+
+	delete[] Set;
+	return 0;
+}
