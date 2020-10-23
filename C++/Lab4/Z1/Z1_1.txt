@@ -1,0 +1,33 @@
+#include <iostream>
+#include <stack>
+#include <string>
+#include <queue>
+
+using namespace std;
+
+int main()
+{
+	setlocale(LC_ALL, "ru");
+
+	stack<char> st; queue<char> q;
+	string str("ABC CBA");
+
+	for (int i = 0; i < str.size(); i++)
+	{
+		st.push(str[i]); q.push(str[i]); // Добавляем элементы
+	}
+	
+	for (int i = 0; i < str.size(); i++)
+	{
+		if (q.front() != st.top())
+		{
+			cout << "Строка " << "\"" << str << "\"" << " не является палиндромом." << endl;
+			return 0;
+		}
+		q.pop();	// Извлекаем 1й элемент
+		st.pop();	// Извлекаем последний элемент
+	}
+	cout << "Строка " << "\"" << str << "\"" << " является палиндромом." << endl;
+
+	return 0;
+}
