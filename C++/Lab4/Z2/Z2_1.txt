@@ -1,0 +1,84 @@
+#include <iostream>
+#include <stack>
+#include <string>
+#include <queue>
+
+using namespace std;
+
+int sort(string &str1) // Сортируем скобки и возвращаем размер без пробелов
+{
+	for (int i = 0; i < str1.size(); i++)
+	{
+		for (int i = 0; i < str1.size() - 1; i++)
+		{
+			if (str1[i] < str1[i + 1])
+			{
+				swap(str1[i], str1[i + 1]);
+			}
+		}
+	}
+	for (int i = 0; true; i++)
+	{
+		if (str1[i + 1] == ' ')
+		{
+			return i + 1;
+		}
+	}
+}
+bool funk(stack<char> st1, char ch)	// Определение количества скобок данного вида
+{
+	int c = 0;
+	while(true)
+	{
+		if (st1.empty()) break;;
+		if (st1.top() == ch)
+		{
+			++c;
+		}
+		st1.pop();
+	}
+
+	if (c % 2 == 0) return true;	// Скобок чётное
+	else false;						// Скобок нечётное
+}
+int main()
+{
+	setlocale(LC_ALL, "ru");
+
+	stack<char> st;
+	string str("( { [ ( { [");
+	int sz = str.size() * 2;
+	char* newstr = new char[sz];
+
+	int strsize = sort(str); // Сортируем скобки
+
+	for (int i = 0; i < strsize; i++)
+	{
+		st.emplace(str[i]);
+	}
+	
+	int newsz = 1;
+	for (int i = 0; true; i++)
+	{
+		if (st.empty() == 1) break;
+
+
+		newsz++;
+		st.pop();
+	}
+
+
+
+	newstr = (char*)realloc(newstr, newsz * sizeof(char));
+
+
+	for (int i = 0; i < newsz; i++)
+	{
+		cout << newstr[i] << "\t" ;
+	}
+
+	delete[] newstr;
+	
+
+	return 0;
+}
