@@ -1,0 +1,112 @@
+#include <iostream>
+#include <stack>
+#include <string>
+#include <queue>
+#include <windows.h>
+
+using namespace std;
+
+char zam(char a)
+{
+	char b;
+	if (a == '(') b = ')';
+	if (a == '{') b = '}';
+	if (a == '[') b = ']';
+
+	if (a == ')') b = '(';
+	if (a == '}') b = '{';
+	if (a == ']') b = '[';
+
+	return b;
+}
+void funk(string str, char* str1)
+{
+	for (int i = 0; i < str.size(); i++) // Меняем открытые скобки на закрытые
+	{
+		if (str[i] == '(') str1[i] = ')';
+		else if (str[i] == '[') str1[i] = ']';
+		else if (str[i] == '{') str1[i] = '}';
+
+		else if (str[i] == ')') str1[i] = '(';
+		else if (str[i] == ']') str1[i] = '[';
+		else if (str[i] == '}') str1[i] = '{';
+
+		else str1[i] = str[i];
+	}
+}
+int main()
+{
+	setlocale(LC_ALL, "ru"); HANDLE color = GetStdHandle(STD_OUTPUT_HANDLE);
+
+	stack<char> st; stack<int> gap;
+	string str{ "([])[}({)}" };
+	char* str1 = new char[str.size()];		// строка-перевёртыш
+	char* newstr = new char[str.size()*2];
+
+	if (str.size()%2 != 0)
+	{
+		cout << "Скобок нечётное количество." << endl;
+
+		return 0;
+	}
+
+	funk(str, str1); // Меняем открытие скобки на закрытые
+
+	int j = 0;
+	for (int i = 0; i < str.size(); i++)
+	{
+		if (str[i] == '(' || str[i] == '[' || str[i] == '{')
+		{
+			st.emplace(str[i]);
+			newstr[j++] = str[i];
+			newstr[j++] = ' ';
+			gap.emplace(j - 1);	// Запоминаем индексы пробелов
+		}
+		else if (str[i] == ')' || str[i] == ']' || str[i] == '}')
+		{
+			if (str1[i] == st.top())
+			{
+				st.pop();
+				newstr[j++] = str[i];
+			}
+			else
+			{
+				if (str[i] == '}')
+				{
+					newstr[gap.top()] = '{';
+					newstr[j++] = '}';
+				}
+				if (str[i] == ')')
+				{
+					newstr[gap.top()] = '(';
+					newstr[j++] = ')';
+				}
+				if (str[i] == ']')
+				{
+					newstr[gap.top()] = '[';
+					newstr[j++] = ']';
+				}
+				newstr[j++] = zam(st.top());
+				st.pop();
+				gap.pop();
+			}
+		}
+		else continue;
+	}
+
+	for (int i = 0; i < j; i++)
+	{
+		SetConsoleTextAttribute(color, FOREGROUND_BLUE);
+		if (newstr[i] == '(' || newstr[i] == ')') cout << newstr[i];
+
+		SetConsoleTextAttribute(color, FOREGROUND_GREEN);
+		if (newstr[i] == '{' || newstr[i] == '}') cout << newstr[i];
+
+		SetConsoleTextAttribute(color, FOREGROUND_RED);
+		if (newstr[i] == '[' || newstr[i] == ']') cout << newstr[i];
+	}
+	SetConsoleTextAttribute(color, FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN);
+	cout << endl;
+
+	return 0;
+}
