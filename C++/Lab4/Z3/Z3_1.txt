@@ -1,0 +1,168 @@
+#include <iostream>
+#include <ctime>
+#include <windows.h>
+#include <vector>
+#include <fstream>
+#include <string>
+#include <algorithm>
+using namespace std;
+
+void zap(vector<int> &v)
+{
+	ifstream file("C:\\users\\ahgin\\desktop\\lab4\\fl.txt");
+	if (!file) cout << "Ошибка открытия файла fl.txt." << endl;
+
+	int val;
+	for (int i = 0; !file.eof(); i++)	// Заполняем вектор данными из файла
+	{
+		file >> val;
+		v.push_back(val);
+	}
+}
+int scn()	// Ввод n
+{
+	int n;
+	cout << "Введите n:\t\t\t"; cin >> n;
+
+	return n;
+}
+void pos(int n) // Позиции введённого числа
+{
+	vector<int> v;
+	zap(v);
+
+	for (int i = 0; i < v.size(); i++)
+	{
+		if (v[i] == n) cout << i << " "; // Позиции числа n
+	}
+	cout << endl << endl;
+}
+void printv(vector<int>& v) // Вывод вектора
+{
+	int r = 0;
+	for (int i = 0; i < v.size(); i++)
+	{
+		if (r % 4 == 0 && r != 0) cout << endl;
+		cout << v[i] << " ";
+		r++;
+	}
+}
+bool chet(int n)	// Проверка на чётность
+{
+	vector<int> v;
+	zap(v);
+
+	for (int i = 0; i < v.size(); i++)
+	{
+		if (n % 2 == 0) return true;
+	}
+	return false;
+}
+bool nechet(int n) // Проверка на нечётность
+{
+	vector<int> v;
+	zap(v);
+
+	for (int i = 0; i < v.size(); i++)
+	{
+		if (n % 2 != 0) return true;
+	}
+	return false;
+}
+void pos_chet()	// Номера чётных элементов
+{
+	vector<int> v;
+	zap(v);
+
+	for (int i = 0; i < v.size(); i++)
+	{
+		if (v[i] % 2 == 0) cout << i << " ";
+	}
+}
+bool more_even_numbers(int even, int uneven)	// Проверка: каких элементов больше (чётных, нечётных)
+{
+	if (even > uneven) return true;
+	else return false;
+}
+int sum(bool bl)	// Находим сумму элементов
+{
+	vector<int> v;
+	zap(v);
+	int sum = 0;
+
+	if (bl)	// Если чёт > нечёт
+		while(!v.empty())
+		{
+			if (v.back() % 2 == 0) sum = sum + v.back();
+			v.pop_back();
+		}
+	else	// Если чёт <= нечёт
+		while(!v.empty())
+		{
+			sum = sum + v.back();
+			v.pop_back();
+		}
+
+	return sum;
+}
+
+
+void Task1(vector<int> v)
+{
+	cout << "1." << endl;
+	zap(v);
+	int n = scn();				// Ввод n
+	cout << "Количество чисел " << n << " в файле:\t" << count(v.begin(), v.end(), n) << endl;
+	cout << "Позиции числа " << n << ":\t";
+	pos(n);						// Позиции числа n
+}
+void Task2(vector<int> v)
+{
+	cout << "2." << endl;
+	zap(v);
+	int c1 = count_if(v.begin(), v.end(), chet);
+	int c2 = count_if(v.begin(), v.end(), nechet);
+	cout << "Количество чётных чисел:\t" << c1 << endl;
+	cout << "Позиции чётных чисел:\t"; pos_chet(); cout << endl;
+	cout << "Количество нечётных чисел:\t" << c2 << endl;
+	bool bl = more_even_numbers(c1, c2);
+	if (bl) cout << "Чётных чисел больше." << endl;
+	else cout << "Чётных чисел меньше." << endl;
+	cout << "Сумма:\t" << sum(bl) << endl << endl;
+}
+void Task3(vector<int> v)
+{
+	cout << "3." << endl;
+	zap(v);
+	cout << "Исходный вектор:" << endl;
+	printv(v);					// Заполнение вектора
+	cout << endl;
+	sort(v.begin(), v.end());	// Сортировка
+	cout << endl << "Отсортированный вектор:" << endl;
+	printv(v);
+	cout << endl << endl;
+}
+void Task4(vector<int> v)
+{
+	cout << "4." << endl;
+	zap(v);
+	printv(v); cout << endl << endl;
+	swap(v.front(), v.back());
+	printv(v);
+}
+
+int main()
+{
+	setlocale(LC_ALL, "ru");
+
+	vector<int> v;
+	
+
+	Task1(v);
+	Task2(v);
+	Task3(v);
+	Task4(v);
+
+	cout << endl;
+	return 0;
+}
