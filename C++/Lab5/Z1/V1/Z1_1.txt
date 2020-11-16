@@ -1,0 +1,86 @@
+#include <iostream>
+#include <ctime>
+#include <vector>
+#include <stack>
+#include <queue>
+#include <string>
+#include <algorithm>
+#include <fstream>
+
+
+using namespace std;
+
+
+
+
+bool isOperator(char ChV)			// Проверка символа на принадлежность операторам + - * /
+{
+	if (ChV == '+' || ChV == '-' || ChV == '*' || ChV == '/') return true;
+	
+	return false;
+}
+bool isBracket(char ChV)			// Проверка является ли символ скобкой
+{
+	if (ChV == '(' || ChV == ')') return true;
+	if (ChV == '[' || ChV == ']') return true;
+	if (ChV == '{' || ChV == '}') return true;
+	
+	return false;
+}
+
+void FIaV(vector<char> &v, ifstream &str_file)			// Fill in the vector || заполнение вектора
+{
+	char symbol = 'E';
+	while (str_file.get(symbol))
+	{
+		v.push_back(symbol);
+	}
+	str_file.close();
+}
+void PtV(vector<char> v)					// Print the vector || Вывод вектора на экран
+{
+	for (int i = 0; i < v.size(); i++)
+	{
+		cout << v[i];
+	}
+	cout << endl;
+}
+
+int main()
+{
+	setlocale(LC_ALL, "ru");
+
+	ifstream str_file("C:\\Users\\ahgin\\Desktop\\lab5\\str.txt");
+	if (!str_file) cout << "Ошибка открытия файла str.txt.";
+
+	
+
+	vector<char> v;
+	FIaV(v, str_file);						// Fill in the vector || заполнение вектора
+	cout << "Имеем следующее выражение:\t";
+	PtV(v);								// Print the vector || Вывод вектора на экран
+
+	queue<char> qu;
+	stack<char> st;
+
+	for (int i = 0; i < v.size(); i++)
+	{
+		if (isBracket(v[i]) || isOperator(v[i]))	// Если встречается скобка или оператор + - * /, то
+		{
+			st.emplace(v[i]);				// Кладём в стек
+		}
+
+		if (isdigit(v[i]) || v[i] == '.')		// Если встречается число или точка, то
+		{
+			qu.emplace(v[i]);				// Кладём в очередь
+		}
+	}
+
+
+
+
+
+
+	cout << endl;
+	return 0;
+}
