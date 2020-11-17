@@ -1,0 +1,130 @@
+#include <iostream>
+#include <ctime>
+#include <vector>
+#include <stack>
+#include <queue>
+#include <string>
+#include <algorithm>
+#include <fstream>
+
+
+using namespace std;
+
+
+
+
+bool isOperator(char ChV)			// Проверка символа на принадлежность операторам + - * /
+{
+	if (ChV == '+' || ChV == '-' || ChV == '*' || ChV == '/') return true;
+	
+	return false;
+}
+bool isOperatorLP(char ChV)			// Проверка символа на принадлежность операторам + -
+{
+	if (ChV == '+' || ChV == '-') return true;
+
+	return false;
+}
+bool isOperatorHP(char ChV)				// Проверка символа на принадлежность операторам * /
+{
+	if (ChV == '*' || ChV == '/') return true;
+
+	return false;
+}
+bool isOpenBracket(char ChV)			// Проверка является ли символ открытой скобкой
+{
+	if (ChV == '(') return true;
+	if (ChV == '[') return true;
+	if (ChV == '{') return true;
+	
+	return false;
+}
+bool isClosedBracket(char ChV)			// Проверка является ли символ закрытой скобкой
+{
+	if (ChV == ')') return true;
+	if (ChV == ']') return true;
+	if (ChV == '}') return true;
+
+	return false;
+}
+
+void FIaV(vector<char> &v, ifstream &str_file)			// Fill in the vector || заполнение вектора
+{
+	char symbol = 'E';
+	while (str_file.get(symbol))
+	{
+		v.push_back(symbol);
+	}
+	str_file.close();
+}
+void PtV(vector<char> v)								// Print the vector || Вывод вектора на экран
+{
+	for (int i = 0; i < v.size(); i++)
+	{
+		cout << v[i];
+	}
+	cout << endl;
+}
+
+int main()
+{
+	setlocale(LC_ALL, "ru");
+
+	ifstream str_file("C:\\Users\\ahgin\\Desktop\\lab5\\str.txt");
+	if (!str_file) cout << "Ошибка открытия файла str.txt.";
+
+	
+
+	vector<char> v;
+	FIaV(v, str_file);						// Fill in the vector || заполнение вектора
+	cout << "Имеем следующее выражение:\t";
+	PtV(v);									// Print the vector || Вывод вектора на экран
+
+	queue<char> qu;
+	stack<char> st; st.emplace('x');
+
+
+	for (int i = 0; i < v.size(); i++)
+	{
+		if (isOperatorLP(v[i]) && isOperatorHP(st.top()))				// если встречается оператор вычисления, приоритет которого ниже оператора вычисления, стоящего перед ним (ситуация *+, /+, *-, /-)
+		{
+			qu.emplace(st.top());			// кладём в очередь последний элемент стека, который является * или /
+			st.pop();						// удаляем этот элемент из стека
+			st.emplace(v[i]);				// добавляем в стек - или +
+		}
+		else if (isOpenBracket(v[i]) || isOperator(v[i]))				// если встречается открытая скобка или оператор + - * /, то
+		{
+			st.emplace(v[i]);				// кладём в стек
+		}
+		else if (isClosedBracket(v[i]))
+		{
+			while (!isOpenBracket(st.top()))// пока не встретим открывающую скобку
+			{
+				qu.emplace(st.top());		// добавляем в очередь все операторы вычисления до открытой скобки
+				st.pop();					// удаляем элемент в стеке
+			}
+			st.pop(); // удаляем открывающую скобку в стеке
+		}
+
+		if (isdigit(v[i]))							// если встречается число или точка, то
+		{
+			qu.emplace(v[i]);				// кладём в очередь
+		}
+	}
+	while (!st.empty())
+	{
+		qu.emplace(st.top());
+		st.pop();
+	}
+	while (!qu.empty())
+	{
+		cout << qu.front();
+		qu.pop();
+	}
+
+
+
+
+	cout << endl;
+	return 0;
+}
