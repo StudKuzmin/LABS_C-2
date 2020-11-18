@@ -1,0 +1,187 @@
+#include <iostream>
+#include <ctime>
+#include <vector>
+#include <stack>
+#include <queue>
+#include <string>
+#include <algorithm>
+#include <fstream>
+
+
+using namespace std;
+
+
+
+
+bool isOperator(char ChV)			// Проверка символа на принадлежность операторам + - * /
+{
+	if (ChV == '+' || ChV == '-' || ChV == '*' || ChV == '/') return true;
+	
+	return false;
+}
+bool isOperatorLP(char ChV)			// Проверка символа на принадлежность операторам + -
+{
+	if (ChV == '+' || ChV == '-') return true;
+
+	return false;
+}
+bool isOperatorHP(char ChV)				// Проверка символа на принадлежность операторам * /
+{
+	if (ChV == '*' || ChV == '/') return true;
+
+	return false;
+}
+bool isOpenBracket(char ChV)			// Проверка является ли символ открытой скобкой
+{
+	if (ChV == '(') return true;
+	if (ChV == '[') return true;
+	if (ChV == '{') return true;
+	
+	return false;
+}
+bool isClosedBracket(char ChV)			// Проверка является ли символ закрытой скобкой
+{
+	if (ChV == ')') return true;
+	if (ChV == ']') return true;
+	if (ChV == '}') return true;
+
+	return false;
+}
+
+void FIaV(vector<char> &v, ifstream &str_file)			// Fill in the vector || заполнение вектора
+{
+	char symbol = 'E';
+	while (str_file.get(symbol))
+	{
+		v.push_back(symbol);
+	}
+	str_file.close();
+}
+void PtV(vector<char> v)								// Print the vector || Вывод вектора на экран
+{
+	for (int i = 0; i < v.size(); i++)
+	{
+		cout << v[i];
+	}
+	cout << endl;
+}
+
+void Postfix_Expr(vector<char>& v)										// Преобразование выражения в постфиксную(обратную польскую) запись
+{
+	stack<char> st; st.emplace('x');
+	queue<char> qu;
+
+	for (int i = 0; i < v.size(); i++)
+	{
+		if (isOpenBracket(st.top()) && v[i] == '-' || st.top() == 'x' && v[i] == '-')		// если встречается отрицательное число
+		{
+			qu.emplace('_');
+			do
+			{
+				qu.emplace(v[i++]);			// кладём в очередь само число и символ -
+			} while (isdigit(v[i]) || v[i] == '.');
+			qu.emplace('_');
+		}
+		if (isOperatorLP(v[i]) && isOperatorHP(st.top()))									// если встречается оператор вычисления, приоритет которого ниже оператора вычисления, стоящего перед ним (ситуация *+, /+, *-, /-)
+		{
+			qu.emplace(st.top());			// кладём в очередь последний элемент стека, который является * или /
+			st.pop();						// удаляем этот элемент из стека
+			st.emplace(v[i]);				// добавляем в стек - или +
+		}
+		else if (isOpenBracket(v[i]) || isOperator(v[i]))									// если встречается открытая скобка или оператор + - * /, то
+		{
+			st.emplace(v[i]);				// кладём в стек
+		}
+		else if (isClosedBracket(v[i]))														// если встречается закрытая скобка
+		{
+			while (!isOpenBracket(st.top()))												// пока не встретим открывающую скобку
+			{
+				qu.emplace(st.top());		// добавляем в очередь все операторы вычисления до открытой скобки
+				st.pop();					// удаляем элемент в стеке
+			}
+			st.pop();						// удаляем открывающую скобку в стеке
+		}
+
+		if (isdigit(v[i]) || v[i] == '.')													// если встречается число или точка, то
+		{
+			qu.emplace(v[i]);				// кладём в очередь
+		}
+	}
+	while (true)
+	{
+		if (st.top() == 'x')
+		{
+			st.pop();
+			break;
+		}
+		qu.emplace(st.top());
+		st.pop();
+	}
+
+	while (!v.empty())						// Очищаем изначальное выражение
+	{
+		v.pop_back();
+	}
+	while (!qu.empty())
+	{
+		v.push_back(qu.front());
+		qu.pop();
+	}
+}
+
+
+int main()
+{
+	setlocale(LC_ALL, "ru");
+
+	ifstream str_file("C:\\Users\\ahgin\\Desktop\\lab5\\str.txt");
+	if (!str_file) cout << "Ошибка открытия файла str.txt.";
+
+	
+
+	vector<char> v;
+	FIaV(v, str_file);						// Fill in the vector || заполнение вектора
+	cout << "Имеем следующее выражение:\t";
+	PtV(v);									// Print the vector || Вывод вектора на экран
+
+	Postfix_Expr(v);						// Преобразуем выражение в постфиксную запись
+
+
+	for (int i = 0; i < v.size(); i++)		// Вывод преобразованного выражения
+	{
+		cout << v[i];
+	}
+	cout << endl;
+	
+
+	stack<char> st;
+	int op1 = 0; 
+	int op2 = 0;
+	int result = 0;
+
+
+	for (int i = 0; i < v.size(); i++)		// Находим значение выражения
+	{
+		if (isdigit(v[i]))											// Если встречается операнд
+		{
+			st.emplace(v[i] - '0');						// Кладём в стек типа int
+		}
+		else														// Иначе
+		{
+			op2 = st.top(); st.pop();					// Запоминаем последние два элемента в стеке и удаляем их из стека
+			op1 = st.top(); st.pop();
+			if (v[i] == '+') result = op1 + op2;
+			else if (v[i] == '-') result = op1 - op2;
+			else if (v[i] == '*') result = op1 * op2;
+			else if (v[i] == '/') result = op1 / op2;
+			st.emplace(result);
+		}
+	}
+	
+	cout << result << endl;
+
+
+
+	cout << endl;
+	return 0;
+}
