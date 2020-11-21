@@ -1,0 +1,214 @@
+#include <iostream>
+#include <ctime>
+#include <vector>
+#include <stack>
+#include <queue>
+#include <string>
+#include <algorithm>
+#include <fstream>
+
+
+using namespace std;
+
+
+
+
+bool isOperator(char ChV)			// Проверка символа на принадлежность операторам + - * /
+{
+	if (ChV == '+' || ChV == '-' || ChV == '*' || ChV == '/') return true;
+
+	return false;
+}
+bool isOperatorLP(char ChV)			// Проверка символа на принадлежность операторам + -
+{
+	if (ChV == '+' || ChV == '-') return true;
+
+	return false;
+}
+bool isOperatorHP(char ChV)				// Проверка символа на принадлежность операторам * /
+{
+	if (ChV == '*' || ChV == '/') return true;
+
+	return false;
+}
+bool isOpenBracket(char ChV)			// Проверка является ли символ открытой скобкой
+{
+	if (ChV == '(') return true;
+	if (ChV == '[') return true;
+	if (ChV == '{') return true;
+
+	return false;
+}
+bool isClosedBracket(char ChV)			// Проверка является ли символ закрытой скобкой
+{
+	if (ChV == ')') return true;
+	if (ChV == ']') return true;
+	if (ChV == '}') return true;
+
+	return false;
+}
+
+void FIaV(vector<char>& v, ifstream& str_file)			// Fill in the vector || заполнение вектора
+{
+	char symbol = 'E';
+	while (str_file.get(symbol))
+	{
+		v.push_back(symbol);
+	}
+	str_file.close();
+}
+void PtV(vector<char> v)								// Print the vector || Вывод вектора на экран
+{
+	for (int i = 0; i < v.size(); i++)
+	{
+		cout << v[i];
+	}
+	cout << endl;
+}
+
+void Postfix_Expr(vector<char>& v)										// Преобразование выражения в постфиксную(обратную польскую) запись
+{
+	stack<char> st;
+	queue<char> qu;
+
+	for (int i = 0; i < v.size(); i++)
+	{
+		if (isdigit(v[i]) || v[i] == '.')				// Если цифра или точка, помещаем в очередь
+		{
+			qu.emplace(v[i]);
+		}
+		if (isOpenBracket(v[i]))
+		{
+			st.emplace(v[i]);
+		}
+		if (isOperator(v[i]))	// Если открытая скобка или оператор, то
+		{
+			if (st.empty())	// Если стек пустой или открытая скобка
+			{
+				st.emplace(v[i]);
+			}
+			else if (isOperatorLP(v[i]) && isOperatorHP(st.top()))
+			{	// Если встречается операция низкого приоритета и в стеке операция низкого приоритета ИЛИ если встречается операция высокого приоритета и в стеке операция высокого приоритета ИЛИ 
+				// если встречается операция низкого приоритета и в стеке операция высокого приоритета
+				
+				while (!st.empty())
+				{
+					if (st.top() == '(') break;
+					qu.emplace(st.top());
+					st.pop();
+				}
+				
+				st.emplace(v[i]);
+			}
+			else if (isOperatorLP(st.top()) && isOperatorLP(v[i]))
+			{
+				qu.emplace(st.top());
+				st.pop();
+				st.emplace(v[i]);
+
+			}
+			else if (isOperatorHP(st.top()) && isOperatorHP(v[i]))
+			{
+				qu.emplace(st.top());
+				st.pop();
+				st.emplace(v[i]);
+			}
+			else
+			{
+				st.emplace(v[i]);
+			}
+
+		}
+		else if (isClosedBracket(v[i]))
+		{
+			while (true)
+			{
+				if (st.top() == '(')
+				{
+					st.pop();
+					break;
+				}
+				qu.emplace(st.top());
+				st.pop();
+			}
+		}
+	}
+	while (!st.empty())
+	{
+		qu.emplace(st.top());
+		st.pop();
+	}
+
+	while (!v.empty())						// Очищаем изначальное выражение
+	{
+		v.pop_back();
+	}
+	while (!qu.empty())
+	{
+		v.push_back(qu.front());
+		qu.pop();
+	}
+}
+
+
+
+int main()
+{
+	setlocale(LC_ALL, "ru");
+
+	ifstream str_file("C:\\Users\\ahgin\\Desktop\\lab5\\str.txt");
+	if (!str_file) cout << "Ошибка открытия файла str.txt.";
+
+
+
+	vector<char> v;
+	FIaV(v, str_file);						// Fill in the vector || заполнение вектора
+	cout << "Имеем следующее выражение:\t";
+	PtV(v);									// Print the vector || Вывод вектора на экран
+
+	Postfix_Expr(v);
+
+	for (int i = 0; i < v.size(); i++)
+	{
+		cout << v[i];
+	}
+
+
+
+
+
+	stack<int> st;
+	int op1 = 0;
+	int op2 = 0;
+	int result = 0;
+
+	for (int i = 0; i < v.size(); i++)
+	{
+		if (isdigit(v[i]))
+		{
+			st.emplace(v[i] - '0');
+		}
+		else if (st.size() == 1 && v[i] == '-')
+		{
+			st.emplace(0);
+		}
+		else
+		{
+			op2 = st.top(); st.pop();
+			op1 = st.top(); st.pop();
+			
+			if (v[i] == '+') result = op1 + op2;
+			if (v[i] == '-') result = op1 - op2;
+			if (v[i] == '*') result = op1 * op2;
+			if (v[i] == '/') result = op1 / op2;
+
+			st.emplace(result);
+		}
+	}
+
+	cout << endl << result << endl;
+
+
+	cout << endl;
+	return 0;
+}
