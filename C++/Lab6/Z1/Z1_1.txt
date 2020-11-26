@@ -1,0 +1,84 @@
+#include <iostream>
+
+using namespace std;
+
+
+
+class table
+{
+private:
+	int size;			// Размер стола
+	const char* color;		// Цвет стола
+
+public:
+	table()
+	{
+
+	}
+	table(int size, const char* color)
+	{
+		this->color = new char[10];
+		color = new char[10];
+
+		this->size = size;
+		this->color = color;
+	}
+	~table()
+	{
+		delete[] color;
+	}
+
+
+	int CalcVolume()
+	{
+		return size;	// Объём стола
+	}
+};
+
+
+
+class CompTable: public table
+{
+private:
+	int h;
+	const char* material;
+
+public:
+	CompTable()
+	{
+
+	}
+	CompTable(int h, const char* material)
+	{
+		this->material = new char[10];
+		material = new char[10];
+
+		this->h = h;
+		this->material = material;
+	}
+	~CompTable()
+	{
+		delete[] material;
+	}
+
+
+	int CalcVolumeCT()
+	{
+		return h * h * h + CalcVolume();		// Размер компьютерной подставки + объём стола. (объём стола и комп.стола общий)
+	}
+};
+
+int main()
+{
+	setlocale(LC_ALL, "ru");
+
+	table T(6, "Black");
+	CompTable C(3, "Wood");
+
+
+	cout << "Объём стола без подставки:\t" << T.CalcVolume() << endl;
+	cout << "Объём стола с подставкой:\t" << C.CalcVolumeCT() << endl;
+
+	cout << endl;
+	return 0;
+}
