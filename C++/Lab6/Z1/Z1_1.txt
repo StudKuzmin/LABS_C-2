@@ -4,18 +4,18 @@ using namespace std;
 
 
 
-class table
+class Table
 {
 private:
-	int size;			// Размер стола
+	int size;				// Размер стола
 	const char* color;		// Цвет стола
 
 public:
-	table()
+	Table()
 	{
-
+		cout << "Const Table" << endl;
 	}
-	table(int size, const char* color)
+	Table(int size, const char* color)
 	{
 		this->color = new char[10];
 		color = new char[10];
@@ -23,21 +23,21 @@ public:
 		this->size = size;
 		this->color = color;
 	}
-	~table()
+	~Table()
 	{
 		delete[] color;
 	}
 
-
 	int CalcVolume()
 	{
+		cout << "Объём стола:\t";
 		return size;	// Объём стола
 	}
 };
 
 
 
-class CompTable: public table
+class CompTable : public Table
 {
 private:
 	int h;
@@ -46,9 +46,9 @@ private:
 public:
 	CompTable()
 	{
-
+		cout << "Const CompTable" << endl;
 	}
-	CompTable(int h, const char* material)
+	CompTable(int h, const char* material, int size, const char* color):Table(size, color)			// Вызываем конструктор родителя ???????
 	{
 		this->material = new char[10];
 		material = new char[10];
@@ -62,9 +62,10 @@ public:
 	}
 
 
-	int CalcVolumeCT()
+	int CalcVolume()
 	{
-		return h * h * h + CalcVolume();		// Размер компьютерной подставки + объём стола. (объём стола и комп.стола общий)
+		cout << "Объём комп. стола:\t";
+		return h * h * h + Table::CalcVolume();		// Размер компьютерной подставки + объём стола. (объём стола и комп.стола общий)
 	}
 };
 
@@ -72,12 +73,26 @@ int main()
 {
 	setlocale(LC_ALL, "ru");
 
-	table T(6, "Black");
-	CompTable C(3, "Wood");
 
+	//Table* T = new CompTable(3, "Железо", 6, "Красный");				// Создаётся указатель на объект класса типа table и ему присваивается выделенная память класса CompTable ?????
+	
+	// CompTable C(3, "Железо", 6, "Красный");
 
-	cout << "Объём стола без подставки:\t" << T.CalcVolume() << endl;
-	cout << "Объём стола с подставкой:\t" << C.CalcVolumeCT() << endl;
+	Table* T;
+
+	bool key;
+
+	cout << "Table(1) or CompTable(0)?\t"; cin >> key;
+	if (key == true)
+	{
+		T = new Table(6, "Красный");
+	}
+	else
+	{
+		T = new CompTable(3, "Железо", 6, "Красный");
+	}
+
+	cout << T->CalcVolume() << endl;
 
 	cout << endl;
 	return 0;
