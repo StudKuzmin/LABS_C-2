@@ -1,0 +1,127 @@
+#include <iostream>
+
+using namespace std;
+
+
+
+class Table
+{
+private:
+	int size;			// Размер стола
+
+protected:
+	int GetSize()
+	{
+		return size;
+	}
+public:
+	Table()
+	{
+		cout << "Const Table" << endl;
+	}
+	Table(int size)
+	{
+		//cout << "Попали в тейбл" << endl;
+
+		this->size = size;
+	}
+
+	virtual int CalcVolume()				// Виртуальный метод. Virtual значит, что мы переопределяем этот метод родителя в потомке.
+	{
+		return size;	// Объём стола
+	}
+};
+
+
+
+class CompTable : public Table
+{
+private:
+	int h;
+
+public:
+	CompTable()
+	{
+		cout << "Const CompTable" << endl;
+	}
+	CompTable(int h, int size):Table(size)			// Вызываем конструктор родителя ???????
+	{
+		//cout << "Попали в комптейпбл" << endl;
+		
+
+		this->h = h;
+	}
+
+
+	int CalcVolume() override	// Ключевое слово override явно указывает компилятору на то, что родительский метод CalcVolume мы переопределяем в потомке. Т.е. override вернёт компилятору ложь, 
+	{							// Если мы поменяем тип возвращаемого значения или поменяем имя метода или добавим какие-нибудь параметры в метод.
+								// !!! override рекомендуется писать всегда, если мы переопределяем родительский метод в потомке
+
+		return h * h * h + Table::CalcVolume();		// Размер компьютерной подставки + объём стола. (объём стола и комп.стола общий)
+	}
+};
+
+class WriteTable : public Table
+{
+private:
+	int s;
+
+public:
+	WriteTable()
+	{
+
+	}
+	WriteTable(int s, int size) :Table(size)
+	{
+		this->s = s;
+	}
+
+	int CalcVolume() override				// Виртуальный метод. Virtual значит, что мы переопределяем этот метод родителя в потомке.
+	{
+		return s*s*s + Table::CalcVolume();	// Объём стола
+	}
+};
+
+
+
+
+
+
+
+int price(int c, int un_v)
+{
+	return c * un_v;
+}
+
+int main()
+{
+	setlocale(LC_ALL, "ru");
+
+
+	//Table* T = new CompTable(3, "Железо", 6, "Красный");				// Создаётся указатель на объект класса типа table и ему присваивается выделенная память класса CompTable ?????
+	
+	// CompTable C(3, "Железо", 6, "Красный");
+
+	Table* T;
+	bool key;
+
+	cout << "Table(1) or CompTable(0)?\t"; cin >> key;
+	if (key == true)
+	{
+		T = new Table(6);
+		cout << "Объём стола:\t\t";
+	}
+	else
+	{
+		T = new CompTable(3, 6);
+		cout << "Объём комп. стола:\t";
+	}
+
+	cout << T->CalcVolume() << endl;
+	cout << "Стоимость стола:\t" << price(T->CalcVolume(), 4) << endl;
+
+
+
+	cout << endl;
+	return 0;
+}
