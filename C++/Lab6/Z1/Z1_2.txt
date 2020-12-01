@@ -1,0 +1,237 @@
+#include <iostream>
+
+using namespace std;
+
+
+
+class Table
+{
+private:
+	int size;			// Размер стола
+	char* color;		// Цвет стола
+
+protected:
+	int GetSize()
+	{
+		return size;
+	}
+	char* GetColor()
+	{
+		return color;
+	}
+public:
+	Table()
+	{
+		cout << "Const Table" << endl;
+	}
+	Table(int size, const char* color1)
+	{
+		//cout << "Попали в тейбл" << endl;
+		this->color = new char[30];
+		color = new char[30];
+
+		this->size = size;
+		strcpy(color, color1);
+	}
+	~Table()
+	{
+		delete[] color;
+	}
+
+	virtual void Show()
+	{
+		cout << "Size:\t\t\t" << size << endl;
+		cout << "Color:\t\t\t" << color << endl;
+	}
+
+	virtual int CalcVolume()				// Виртуальный метод. Virtual значит, что мы переопределяем этот метод родителя в потомке.
+	{
+		return size;	// Объём стола
+	}
+};
+
+
+
+class CompTable : public Table
+{
+private:
+	int h;
+	char* material;
+
+public:
+	CompTable()
+	{
+		cout << "Const CompTable" << endl;
+	}
+	CompTable(int h, const char* material1, int size, const char* color):Table(size, color)			// Вызываем конструктор родителя ???????
+	{
+		//cout << "Попали в комптейпбл" << endl;
+		this->material = new char[10];
+		material = new char[10];
+
+		this->h = h;
+		strcpy(material, material1);
+	}
+	~CompTable()
+	{
+		delete[] material;
+	}
+
+	void Show()
+	{
+		cout << "h:\t\t\t" << h << endl;
+		cout << "material:\t\t" << material << endl;
+		cout << "Size:\t\t\t" << GetSize() << endl;
+		cout << "Color:\t\t\t" << GetColor() << endl;
+	}
+	int CalcVolume() override	// Ключевое слово override явно указывает компилятору на то, что родительский метод CalcVolume мы переопределяем в потомке. Т.е. override вернёт компилятору ложь, 
+	{							// Если мы поменяем тип возвращаемого значения или поменяем имя метода или добавим какие-нибудь параметры в метод.
+								// !!! override рекомендуется писать всегда, если мы переопределяем родительский метод в потомке
+
+		return h * h * h + Table::CalcVolume();		// Размер компьютерной подставки + объём стола. (объём стола и комп.стола общий)
+	}
+};
+
+class WriteTable : public Table
+{
+private:
+	int s;
+	char* material;
+
+public:
+	WriteTable()
+	{
+
+	}
+	WriteTable(int s, const char* material1, int size, const char* color) :Table(size, color)
+	{
+		this->material = new char[10];
+		material = new char[10];
+
+		this->s = s;
+		strcpy(material, material1);
+	}
+	~WriteTable()
+	{
+		delete[] material;
+	}
+
+	void Show()
+	{
+		cout << "s:\t\t\t" << s << endl;
+		cout << "material:\t\t" << material << endl;
+		cout << "Size:\t\t\t" << GetSize() << endl;
+		cout << "Color:\t\t\t" << GetColor() << endl;
+	}
+	int CalcVolume()				// Виртуальный метод. Virtual значит, что мы переопределяем этот метод родителя в потомке.
+	{
+		return s*s*s + Table::CalcVolume();	// Объём стола
+	}
+};
+
+int main()
+{
+	setlocale(LC_ALL, "ru");
+
+
+	//Table* T = new CompTable(3, "Железо", 6, "Красный");				// Создаётся указатель на объект класса типа table и ему присваивается выделенная память класса CompTable ?????
+	
+	// CompTable C(3, "Железо", 6, "Красный");
+
+	Table* T;
+	bool key;
+
+	cout << "Table(1) or CompTable(0)?\t"; cin >> key;
+	if (key == true)
+	{
+		T = new Table(6, "Красный");
+		cout << "Объём стола:\t\t";
+	}
+	else
+	{
+		T = new CompTable(3, "Пластик", 6, "Красный");
+		cout << "Объём комп. стола:\t";
+	}
+
+	cout << T->CalcVolume() << endl;
+	T->Show();
+
+
+
+
+
+
+
+
+
+
+
+
+	cout << endl << "-------------" << endl << endl;
+	Table Ta(10, "Чёрный");
+	CompTable Co(3, "Дерево", 10, "Чёрный");
+
+	cout << "Объём стола:\t\t";
+	cout << Ta.CalcVolume() << endl;
+	Ta.Show(); cout << endl;
+	cout << "Объём комп. стола:\t";
+	cout << Co.CalcVolume() << endl;
+	Co.Show();
+
+
+
+
+
+
+
+
+
+
+
+	cout << endl << "#############" << endl << endl;
+	Table* Tab;
+
+	cout << "Table(1) or WriteTable(0)?\t"; cin >> key;
+	if (key == true)
+	{
+		Tab = new Table(4, "Коричневый");
+		cout << "Объём стола:\t\t";
+	}
+	else
+	{
+		Tab = new WriteTable(5, "Стекло", 4, "Коричневый");
+		cout << "Объём письм. стола:\t";
+	}
+	cout << Tab->CalcVolume() << endl;
+	Tab->Show();
+
+
+
+
+
+
+
+
+
+
+	cout << endl << "-------------" << endl << endl;
+	Table Tabl(2, "Синий");
+	CompTable Com(7, "Металл", 2, "Синий");
+
+	cout << "Объём стола:\t\t";
+	cout << Tabl.CalcVolume() << endl;
+	Tabl.Show(); cout << endl;
+	cout << "Объём комп. стола:\t";
+	cout << Com.CalcVolume() << endl;
+	Com.Show();
+
+
+
+
+
+
+
+
+	cout << endl;
+	return 0;
+}
